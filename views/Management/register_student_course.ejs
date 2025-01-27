@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>רישום תלמיד לקורס</title>
+  <link rel="stylesheet" href="/css/Management/register_student_course.css">
+</head>
+<body>
+  <header>
+    <h1>רישום תלמיד לקורס</h1>
+  </header>
+  <main>
+    <form id="registerStudentCourseForm" action="/Management/register-student-course" method="post">
+      <div>
+        <label for="students">בחר תלמידים:</label>
+        <select name="studentIds" id="students" multiple required>
+          <% students.forEach(student => { %>
+            <option value="<%= student.ID_ %>"><%= student.email %> - <%= student.NAME_STUDENT %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div>
+        <label for="course">בחר קורס:</label>
+        <select name="courseId" id="course" required>
+          <% courses.forEach(course => { %>
+            <option value="<%= course.ID_COURSE %>"><%= course.Name_Course %></option>
+          <% }); %>
+        </select>
+      </div>
+      <button type="submit">רשום תלמידים</button>
+    </form>
+  </main>
+  <script>
+    document.getElementById('registerStudentCourseForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const jsonData = Object.fromEntries(formData);
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jsonData)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert('התלמידים נרשמו בהצלחה!');
+          form.reset();
+        } else {
+          const errorData = await response.json();
+          alert(`הייתה בעיה ברישום התלמידים: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('הייתה בעיה ברישום התלמידים.');
+      }
+    });
+  </script>
+</body>
+</html>

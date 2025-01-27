@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>אימות קוד</title>
+  <link rel="stylesheet" href="/css/login.css">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>אימות קוד</h1>
+  </header>
+  <main>
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+    <% if (success) { %>
+      <div class="success"><%= success %></div>
+    <% } %>
+    <form action="/verify-code" method="post" class="verify-code-form">
+      <input type="hidden" name="email" value="<%= email %>">
+      <div class="form-group">
+        <label for="code">הזן את הקוד שקיבלת במייל:</label>
+        <input type="text" id="code" name="code" required>
+      </div>
+      <button type="submit" class="btn">אימות קוד</button>
+    </form>
+  </main>
+</body>
+</html>

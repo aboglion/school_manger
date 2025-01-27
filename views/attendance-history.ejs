@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>היסטוריית נוכחות</title>
+  <link rel="stylesheet" href="/css/attendance-history.css">
+</head>
+<body>
+  <header>
+    <h1>היסטוריית נוכחות</h1>
+  </header>
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>תאריך שיעור</th>
+          <th>שם קורס</th>
+          <th>נוכחות</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% attendanceHistory.forEach(record => { %>
+          <tr>
+            <td><%= record.LESSON_DATE %></td>
+            <td><%= record.Name_Course %></td>
+            <td><%= record.PRESENT ? 'נוכח' : 'לא נוכח' %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

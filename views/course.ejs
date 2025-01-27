@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>מידע על הקורס</title>
+  <link rel="stylesheet" href="/css/course.css">
+</head>
+<body>
+  <header>
+    <h1>מידע על הקורס: <%= course.Name_Course %></h1>
+  </header>
+  <main>
+    <section>
+      <h2>עבודות בית</h2>
+      <ul>
+        <% homeworks.forEach(homework => { %>
+          <li>
+            <strong>תיאור:</strong> <%= homework.HOMEWORKLBL %><br>
+            <strong>תאריך הגשה:</strong> <%= homework.DEADLINE %><br>
+            <% if (homework.grade) { %>
+              <strong>ציון:</strong> <%= homework.grade %>
+            <% } else { %>
+              <strong>ציון:</strong> טרם נבדק
+            <% } %>
+            <br>
+            <form action="/submit-homework" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="homeworkId" value="<%= homework.ID_HOMEWORK %>">
+              <input type="hidden" name="studentId" value="<%= studentId %>">
+              <label for="file">הגש עבודה:</label>
+              <input type="file" name="file" required>
+              <button type="submit">שלח</button>
+            </form>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+    <section>
+      <h2>חומרים מהמרצה</h2>
+      <ul>
+        <% materials.forEach(material => { %>
+          <li><a href="/uploads/<%= material.FILE_NAME %>"><%= material.FILE_NAME %></a></li>
+        <% }); %>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

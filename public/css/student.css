@@ -1,0 +1,75 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background-color: #4caf50;
+    color: white;
+    padding: 1em;
+    text-align: center;
+  }
+  main {
+    padding: 2em;
+  }
+  h2 {
+    color: #4caf50;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  ul li {
+    background-color: #e0e0e0;
+    margin: 0.5em 0;
+    padding: 1em;
+  }
+  form {
+    background-color: #e0e0e0;
+    padding: 1em;
+    margin-top: 2em;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.5em;
+  }
+  input {
+    width: calc(100% - 2em);
+    padding: 0.5em;
+    margin-bottom: 1em;
+  }
+  button {
+    background-color: #4caf50;
+    color: white;
+    padding: 0.5em 1em;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #45a049;
+  }
+  .logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #FF5733;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .logout-button:hover {
+    background-color: #C70039;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  } 

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>עמוד ניהול למורה</title>
+  <link rel="stylesheet" href="/css/teacher.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 1em 0;
+    }
+
+    main {
+      padding: 2em;
+    }
+
+    section {
+      margin-bottom: 2em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    table th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    table tr:hover {
+      background-color: #ddd;
+    }
+
+    .btn-submit {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: #45a049;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 1em;
+    }
+
+    select, input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ברוך הבא, <%= teacherName %></h1>
+  </header>
+  <main>
+    <section>
+      <h2>רשימת סטודנטים</h2>
+      <ul>
+        <% students.forEach(student => { %>
+          <li><%= student.NAME_STUDENT %> (<%= student.email %>)</li>
+        <% }); %>
+      </ul>
+    </section>
+    
+    <section>
+      <h2>העלאת חומרים</h2>
+      <form action="/teacher/upload-material" method="post" enctype="multipart/form-data">
+        <label for="courseSelect">בחר קורס:</label>
+        <select name="courseId" id="courseSelect" required>
+          <% courses.forEach(course => { %>
+            <option value="<%= course.ID_COURSE %>"><%= course.Name_Course %></option>
+          <% }); %>
+        </select>
+        <label for="fileType">סוג הקובץ:</label>
+        <select name="fileType" id="fileType" required>
+          <option value="material">חומר כללי</option>
+          <option value="homework">עבודת בית</option>
+        </select>
+        <label for="file">בחר קובץ:</label>
+        <input type="file" name="file" required>
+        <button type="submit" class="btn-submit">העלה</button>
+      </form>
+    </section>
+    <section>
+      <h2>סימון נוכחות</h2>
+      <form id="markAttendanceForm" action="/teacher/mark-attendance" method="post">
+        <label for="lessonId">בחר שיעור:</label>
+        <select name="lessonId" id="lessonId" required>
+          <% lessons.forEach(lesson => { %>
+            <option value="<%= lesson.ID_LESSON %>"><%= lesson.LESSON_DATE %> - <%= lesson.Name_Course %></option>
+          <% }); %>
+        </select>
+        <table>
+          <thead>
+            <tr>
+              <th>סטודנט</th>
+              <th>נוכח</th>
+              <th>לא נוכח</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% students.forEach(student => { %>
+              <tr>
+                <td><%= student.NAME_STUDENT %></td>
+                <td>
+                  <input type="radio" name="attendance[<%= student.ID_ %>]" value="1" required> נוכח
+                </td>
+                <td>
+                  <input type="radio" name="attendance[<%= student.ID_ %>]" value="0" required> לא נוכח
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        <button type="submit" class="btn-submit">שמור נוכחות</button>
+      </form>
+    </section>
+  </main>
+  <script>
+    document.getElementById('markAttendanceForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const jsonData = Object.fromEntries(formData.entries());
+      const attendance = {};
+      
+      formData.forEach((value, key) => {
+        if (key.startsWith('attendance')) {
+          const studentId = key.split('[')[1].split(']')[0];
+          attendance[studentId] = value;
+        } else {
+          jsonData[key] = value;
+        }
+      });
+      jsonData.attendance = attendance;
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jsonData)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert(data.message);
+        } else {
+          alert('הייתה בעיה בשמירת הנוכחות.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('הייתה בעיה בשמירת הנוכחות.');
+      }
+    });
+  </script>
+</body>
+</html>

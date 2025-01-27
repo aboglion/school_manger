@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>עמוד תלמיד</title>
+  <link rel="stylesheet" href="/css/student.css">
+</head>
+<body>
+  <a href="/logout" class="logout-button">יציאה</a>
+
+  <header>
+    <h1>ברוך הבא, <%= studentName %></h1>
+  </header>
+  <main>
+    <section>
+      <h2>רשימת קורסים</h2>
+      <ul>
+        <% courses.forEach(course => { %>
+          <li><a href="/student/course/<%= course.ID_COURSE %>"><%= course.Name_Course %></a></li>
+        <% }); %>
+      </ul>
+    </section>
+    <section>
+      <h2>לוח שבועי</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>תאריך</th>
+            <th>שם קורס</th>
+            <th>שעת התחלה</th>
+            <th>שעת סיום</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% schedule.forEach(item => { %>
+            <tr>
+              <td><%= item.LESSON_DATE %></td>
+              <td><%= item.Name_Course %></td>
+              <td><%= item.start_time %></td>
+              <td><%= item.end_time %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

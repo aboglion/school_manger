@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>הוסף קורס</title>
+  <link rel="stylesheet" href="/css/Management/add-course.css">
+</head>
+<body>
+  <header>
+    <h1>הוסף קורס חדש</h1>
+  </header>
+  <main>
+    <form id="addCourseForm" action="/Management/addCorse" method="post">
+      <label for="courseName">שם קורס:</label>
+      <input type="text" id="courseName" name="courseName" required>
+      <label for="information">מידע על הקורס:</label>
+      <textarea id="information" name="information" required></textarea>
+      <label for="startDate">תאריך התחלה:</label>
+      <input type="date" id="startDate" name="startDate" required>
+      <label for="startTime">שעת התחלה:</label>
+      <input type="time" id="startTime" name="startTime" required>
+      <label for="endDate">תאריך סיום:</label>
+      <input type="date" id="endDate" name="endDate" required>
+      <label for="endTime">שעת סיום:</label>
+      <input type="time" id="endTime" name="endTime" required>
+      <label for="teacherSelect">בחר מורה:</label>
+      <select id="teacherSelect" name="teacherSelect" required>
+        <% teachers.forEach(teacher => { %>
+          <option value="<%= teacher.ID_ %>"><%= teacher.NAME_TEACHER %></option>
+        <% }) %>
+      </select>
+      <button type="submit">הוסף קורס</button>
+    </form>
+  </main>
+  <script>
+    document.getElementById('addCourseForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const jsonData = Object.fromEntries(formData);
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jsonData)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert(`הקורס ${data.courseName} נוסף בהצלחה!`);
+          form.reset();
+        } else {
+          const errorData = await response.json();
+          alert(`הייתה בעיה בהוספת הקורס: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('הייתה בעיה בהוספת הקורס.');
+      }
+    });
+  </script>
+</body>
+</html>

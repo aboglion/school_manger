@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>הוסף מורה</title>
+  <link rel="stylesheet" href="/css/Management/add_teacher.css">
+</head>
+<body>
+  <header>
+    <h1>הוסף מורה חדש</h1>
+  </header>
+  <main>
+    <form id="addTeacherForm" action="/Management/addTeacher" method="post">
+      <label for="teacherName">שם מורה:</label>
+      <input type="text" id="teacherName" name="teacherName" required>
+      <label for="teacherEmail">דוא"ל:</label>
+      <input type="email" id="teacherEmail" name="teacherEmail" required>
+      <label for="teacherPhone">טלפון:</label>
+      <input type="text" id="teacherPhone" name="teacherPhone" required>
+      <label for="teacherAddress">כתובת:</label>
+      <input type="text" id="teacherAddress" name="teacherAddress" required>
+      <label for="id">תעודת זהות:</label>
+      <input type="text" id="id" name="id" required>
+      <button type="submit">הוסף מורה</button>
+    </form>
+  </main>
+  <script>
+    document.getElementById('addTeacherForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const jsonData = Object.fromEntries(formData);
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jsonData)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert(`המורה ${data.teacherName} נוסף בהצלחה!`);
+          form.reset();
+        } else {
+          alert('הייתה בעיה בהוספת המורה.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('הייתה בעיה בהוספת המורה.');
+      }
+    });
+  </script>
+</body>
+</html>

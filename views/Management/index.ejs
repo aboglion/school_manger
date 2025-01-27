@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>ניהול מערכת</title>
+  <link rel="stylesheet" href="/css/Management/index.css">
+  <style>
+    .logout-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #FF5733;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .logout-button:hover {
+      background-color: #C70039;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ברוך הבא לניהול המערכת</h1>
+    <a href="/logout" class="logout-button">יציאה</a>
+  </header>
+  <main>
+    <nav>
+      <ul>
+        <li><a href="/Management/add-course">הוסף קורס</a></li>
+        <li><a href="/Management/add-Teacher">הוסף מורה</a></li>
+        <li><a href="/Management/student">הוסף תלמיד</a></li>
+        <li><a href="/Management/add-class">הוסף כיתה</a></li>
+        <li><a href="/Management/Education_date">ניהול לוח זמנים</a></li>
+        <li><a href="/Management/register-student-course">רישום תלמיד לקורס</a></li> <!-- לחצן חדש -->
+
+      </ul>
+    </nav>
+  </main>
+</body>
+</html>

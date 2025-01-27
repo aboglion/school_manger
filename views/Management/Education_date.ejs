@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>ניהול לוח זמנים</title>
+  <link rel="stylesheet" href="/css/Management/Education_date.css">
+</head>
+<body>
+  <header>
+    <h1>ניהול לוח זמנים</h1>
+  </header>
+  <main>
+    <form action="/Management/addclassWithCuorse" method="post">
+      <label for="ID_COURSE">מספר קורס:</label>
+      <select id="ID_COURSE" name="ID_COURSE">
+        <% courses.forEach(course => { %>
+          <option value="<%= course.ID_COURSE %>"><%= course.Name_Course %></option>
+        <% }) %>
+      </select>
+      <label for="ID_CLASS">מספר כיתה:</label>
+      <select id="ID_CLASS" name="ID_CLASS">
+        <% classes.forEach(clas => { %>
+          <option value="<%= clas.ID_CLASS %>"><%= clas.CLASS_NAME %></option>
+        <% }) %>
+      </select>
+      <label for="start_date">תאריך התחלה:</label>
+      <input type="date" id="start_date" name="start_date">
+      <label for="start_time">שעת התחלה:</label>
+      <input type="time" id="start_time" name="start_time">
+      <label for="end_time">שעת סיום:</label>
+      <input type="time" id="end_time" name="end_time">
+      <button type="submit">הוסף ניהול כיתה</button>
+    </form>
+  </main>
+</body>
+</html>
