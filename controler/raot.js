@@ -119,9 +119,36 @@ raot.post('/verify-code', async (req, res) => {
   // التحقق من صحة الكود
   if (code == req.session.verificationCode) { // استخدم == بدلاً من === لأن الكود قد يكون نصًا أو رقمًا
     // الكود صحيح، قم بتوجيه المستخدم لتغيير كلمة المرور
-    res.render('change-password', { email: req.session.email });
+    res.render('change-password', {error:null,success: null , email: req.session.email });
   } else {
-    res.render('verify-code.ejs', { error: 'קוד אימות לא תקין', success: null });
+    res.render('verify-code.ejs', { error: 'קוד אימות לא תקין', success: null , email: req.session.email });
+  }
+});
+raot.post('/change-password', async (req, res) => {
+
+  const {  newPassword, confirmPassword } = req.body;
+  const email= req.session.email;   
+  if (!email || !newPassword || !confirmPassword) {
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.render('change-password', { error: 'הסיסמאות לא תואמות', success: null });
+  }
+
+  try {
+    // עדכון הסיסמה במסד הנתונים
+    const updateQuery = `UPDATE USERS SET PASSWORD = '${newPassword}' WHERE USER_NAME = '${email}'`;
+    await dbFun.updateData(updateQuery);
+
+    // ניקוי הנתונים מהגישה
+    delete req.session.email;
+    delete req.session.verificationCode;
+
+    // הפנייה לדף ההתחברות עם הודעת הצלחה
+    return res.render('login', { error: 'הסיסמה השתנתה בהצלחה', success: null });
+  } catch (error) {
+    console.error('שגיאה:', error);
+    res.render('change-password', { error: 'שגיאה בעדכון הסיסמה', success: null });
   }
 });
 export default raot;
