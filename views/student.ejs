@@ -1,47 +1,93 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>עמוד תלמיד</title>
   <link rel="stylesheet" href="/css/student.css">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <a href="/logout" class="logout-button">יציאה</a>
 
   <header>
-    <h1>ברוך הבא, <%= studentName %></h1>
+    <h1>ברוך הבא, <span id="student-name"><%= studentName %></span></h1> 
   </header>
+
   <main>
-    <section>
+    <!-- قسم רשימת الكورسات -->
+    <section class="courses-section">
       <h2>רשימת קורסים</h2>
-      <ul>
+      <div class="courses-grid">
         <% courses.forEach(course => { %>
-          <li><a href="/student/course/<%= course.ID_COURSE %>"><%= course.Name_Course %></a></li>
-        <% }); %>
-      </ul>
+          <div class="course-card">
+            <a href="/student/course/<%= course.ID_COURSE %>">
+              <h3><%= course.Name_Course %></h3>
+              <p><%= course.infromation || 'אין תיאור' %></p>
+              <p>תאריך השיעור: <%= new Date(course.LESSON_DATE).toLocaleDateString('he-IL') %></p>
+            </a>
+          </div>
+        <% }) %>
+      </div>
     </section>
-    <section>
-      <h2>לוח שבועי</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>תאריך</th>
-            <th>שם קורס</th>
-            <th>שעת התחלה</th>
-            <th>שעת סיום</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% schedule.forEach(item => { %>
+
+    <!-- قسم לוח שבועי -->
+    <section class="schedule-section">
+      <h2>רשימה שבועית</h2>
+      <div class="schedule-table">
+        <table>
+          <thead>
             <tr>
-              <td><%= item.LESSON_DATE %></td>
-              <td><%= item.Name_Course %></td>
-              <td><%= item.start_time %></td>
-              <td><%= item.end_time %></td>
+              <th>תאריך</th>
+              <th>שם קורס</th>
+              <th>שעת התחלה</th>
+              <th>שעת סיום</th>
             </tr>
-          <% }); %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% const lesson="" %>
+            <% schedule.forEach(course => { %>
+              <% const lessonDate = new Date(course.LESSON_DATE); %>
+              <% const today = new Date(); %>
+              <% const daysAhead = (lessonDate - today) / (1000 * 60 * 60 * 24); %>
+              <% if (daysAhead >= 0 && daysAhead <= 7)  { %>
+                <tr>
+                  <td><%= lessonDate.toLocaleDateString('he-IL') %></td>
+                  <td><%= course.Name_Course %></td>
+                  <td><%= course.start_time %></td>
+                  <td><%= course.end_time %></td>
+                </tr>
+              <% } %>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    
+    <!-- Section for 7-day calendar -->
+    <section class="calendar-section">
+      <h2> מערכת לשבוע הקרוב</h2>
+      <div class="calendar-grid">
+        <% const today = new Date(); %>
+        <% for (let i = 0; i < 7; i++) { %>
+          <% const day = new Date(today); %>
+          <% day.setDate(today.getDate() + i); %>
+          <div class="calendar-day">
+            <h3><%= day.toLocaleDateString('he-IL') %></h3>
+            <ul>
+              <% schedule.forEach(course => { %>
+                <% const lessonDate = new Date(course.LESSON_DATE); %>
+                <% if (lessonDate.toDateString() === day.toDateString()) { %>
+                  <li>
+                    <strong><%= course.Name_Course %></strong>
+                    <p><%= course.start_time %> - <%= course.end_time %></p>
+                  </li>
+                <% } %>
+              <% }) %>
+            </ul>
+          </div>
+        <% } %>
+      </div>
     </section>
   </main>
 </body>
