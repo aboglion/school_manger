@@ -1,153 +1,442 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>עמוד ניהול למורה</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap">
   <link rel="stylesheet" href="/css/teacher.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #4CAF50;
-      color: white;
-      text-align: center;
-      padding: 1em 0;
-    }
-
-    main {
-      padding: 2em;
-    }
-
-    section {
-      margin-bottom: 2em;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1em;
-    }
-
-    table th, table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-    }
-
-    table th {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    table tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    table tr:hover {
-      background-color: #ddd;
-    }
-
-    .btn-submit {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .btn-submit:hover {
-      background-color: #45a049;
-    }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 1em;
-    }
-
-    select, input[type="file"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 0.5em;
-    }
-  </style>
 </head>
 <body>
   <header>
     <h1>ברוך הבא, <%= teacherName %></h1>
+    <a href="/logout" class="logout-button">יציאה</a>
   </header>
   <main>
-    <section>
-      <h2>רשימת סטודנטים</h2>
-      <ul>
-        <% students.forEach(student => { %>
-          <li><%= student.NAME_STUDENT %> (<%= student.email %>)</li>
-        <% }); %>
-      </ul>
-    </section>
-    
-    <section>
-      <h2>העלאת חומרים</h2>
-      <form action="/teacher/upload-material" method="post" enctype="multipart/form-data">
-        <label for="courseSelect">בחר קורס:</label>
-        <select name="courseId" id="courseSelect" required>
-          <% courses.forEach(course => { %>
-            <option value="<%= course.ID_COURSE %>"><%= course.Name_Course %></option>
-          <% }); %>
-        </select>
-        <label for="fileType">סוג הקובץ:</label>
-        <select name="fileType" id="fileType" required>
-          <option value="material">חומר כללי</option>
-          <option value="homework">עבודת בית</option>
-        </select>
-        <label for="file">בחר קובץ:</label>
-        <input type="file" name="file" required>
-        <button type="submit" class="btn-submit">העלה</button>
-      </form>
-    </section>
-    <section>
-      <h2>סימון נוכחות</h2>
-      <form id="markAttendanceForm" action="/teacher/mark-attendance" method="post">
-        <label for="lessonId">בחר שיעור:</label>
-        <select name="lessonId" id="lessonId" required>
-          <% lessons.forEach(lesson => { %>
-            <option value="<%= lesson.ID_LESSON %>"><%= lesson.LESSON_DATE %> - <%= lesson.Name_Course %></option>
-          <% }); %>
-        </select>
+    <div class="tabs">
+      <div class="tab active" onclick="openTab(event, 'dashboard')">לוח בקרה</div>
+      <div class="tab" onclick="openTab(event, 'schedule')">מערכת שעות</div>
+      <div class="tab" onclick="openTab(event, 'materials')">חומרי לימוד</div>
+      <div class="tab" onclick="openTab(event, 'homework')">עבודות בית</div>
+      <div class="tab" onclick="openTab(event, 'attendance')">נוכחות</div>
+      <div class="tab" onclick="openTab(event, 'students')">תלמידים</div>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+      <section>
+        <div class="section-header">
+          <h2>סיכום</h2>
+        </div>
+        <div class="grid-container">
+          <div class="card">
+            <h3>קורסים</h3>
+            <p>מספר קורסים: <%= courses.length %></p>
+          </div>
+          <div class="card">
+            <h3>תלמידים</h3>
+            <p>מספר תלמידים: <%= students.length %></p>
+          </div>
+          <div class="card">
+            <h3>עבודות להגשה</h3>
+            <p>מספר עבודות: <%= homeworks.length %></p>
+          </div>
+          <div class="card">
+            <h3>עבודות לבדיקה</h3>
+            <p>מספר עבודות: <%= pendingSubmissions.length %></p>
+            <% if (pendingSubmissions.length > 0) { %>
+              <button class="btn-action btn-secondary" onclick="openTab(event, 'homework')">לבדיקת עבודות</button>
+            <% } %>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-header">
+          <h2>שיעורים קרובים</h2>
+        </div>
         <table>
           <thead>
             <tr>
-              <th>סטודנט</th>
-              <th>נוכח</th>
-              <th>לא נוכח</th>
+              <th>תאריך</th>
+              <th>קורס</th>
+              <th>שעת התחלה</th>
+              <th>שעת סיום</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%
+              const today = new Date();
+              const upcomingLessons = lessons.filter(lesson => {
+                const lessonDate = new Date(lesson.LESSON_DATE);
+                return lessonDate >= today;
+              }).slice(0, 5);
+            %>
+            <% upcomingLessons.forEach(lesson => { %>
+              <tr>
+                <td><%= new Date(lesson.LESSON_DATE).toLocaleDateString('he-IL') %></td>
+                <td><%= lesson.Name_Course %></td>
+                <td><%= lesson.start_time %></td>
+                <td><%= lesson.end_time %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- Schedule Tab -->
+    <div id="schedule" class="tab-content">
+      <section>
+        <div class="section-header">
+          <h2>מערכת שעות שבועית</h2>
+        </div>
+        <div class="schedule-container">
+          <%
+            const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+            const dayMap = {};
+            
+            // Group lessons by day of week
+            schedule.forEach(lesson => {
+              const date = new Date(lesson.LESSON_DATE);
+              const dayOfWeek = date.getDay(); // 0 is Sunday
+              if (!dayMap[dayOfWeek]) {
+                dayMap[dayOfWeek] = [];
+              }
+              dayMap[dayOfWeek].push(lesson);
+            });
+          %>
+          
+          <% days.forEach((day, index) => { %>
+            <div class="day-column">
+              <div class="day-header"><%= day %></div>
+              <% if (dayMap[index] && dayMap[index].length > 0) { %>
+                <% dayMap[index].forEach(lesson => { %>
+                  <div class="lesson-item">
+                    <div><strong><%= lesson.Name_Course %></strong></div>
+                    <div><%= lesson.start_time %> - <%= lesson.end_time %></div>
+                  </div>
+                <% }); %>
+              <% } else { %>
+                <div>אין שיעורים</div>
+              <% } %>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+    </div>
+
+    <!-- Materials Tab -->
+    <div id="materials" class="tab-content">
+      <section>
+        <div class="section-header">
+          <h2>העלאת חומרי לימוד</h2>
+        </div>
+        <form action="/teacher/upload-material" method="post" enctype="multipart/form-data">
+          <label for="courseSelect">בחר קורס:</label>
+          <select name="courseId" id="courseSelect" required>
+            <% courses.forEach(course => { %>
+              <option value="<%= course.ID_COURSE %>"><%= course.Name_Course %></option>
+            <% }); %>
+          </select>
+          <label for="fileType">סוג הקובץ:</label>
+          <select name="fileType" id="fileType" required>
+            <option value="material">חומר לימוד</option>
+          </select>
+          <label for="file">בחר קובץ:</label>
+          <input type="file" name="file" required>
+          <button type="submit" class="btn-submit">העלה</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- Homework Tab -->
+    <div id="homework" class="tab-content">
+      <section>
+        <div class="section-header">
+          <h2>יצירת עבודת בית חדשה</h2>
+          <button class="btn-action" onclick="openHomeworkModal()">יצירת עבודה חדשה</button>
+        </div>
+        
+        <h3>עבודות בית קיימות</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>קורס</th>
+              <th>כותרת</th>
+              <th>תאריך הגשה</th>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% homeworks.forEach(homework => { %>
+              <tr>
+                <td><%= homework.Name_Course %></td>
+                <td><%= homework.HOMEWORKLBL %></td>
+                <td><%= new Date(homework.DEADLINE).toLocaleDateString('he-IL') %></td>
+                <td>
+                  <button class="btn-action btn-secondary" onclick="viewSubmissions('<%= homework.ID_HOMEWORK %>')">צפייה בהגשות</button>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        
+        <h3>הגשות לבדיקה</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>תלמיד</th>
+              <th>קורס</th>
+              <th>עבודה</th>
+              <th>תאריך הגשה</th>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pendingSubmissions.forEach(submission => { %>
+              <tr>
+                <td><%= submission.NAME_STUDENT %></td>
+                <td><%= submission.Name_Course %></td>
+                <td><%= submission.HOMEWORKLBL %></td>
+                <td><%= new Date(submission.SUBMISSION_DATE).toLocaleDateString('he-IL') %></td>
+                <td>
+                  <a href="/teacher/download-submission/<%= submission.ID_SUBMISSION %>" class="btn-action btn-secondary">הורדה</a>
+                  <button class="btn-action" onclick="gradeHomework('<%= submission.ID_SUBMISSION %>')">מתן ציון</button>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- Attendance Tab -->
+    <div id="attendance" class="tab-content">
+      <section>
+        <div class="section-header">
+          <h2>סימון נוכחות</h2>
+        </div>
+        <form id="markAttendanceForm" action="/teacher/mark-attendance" method="post">
+          <label for="lessonId">בחר שיעור:</label>
+          <select name="lessonId" id="lessonId" required>
+            <% lessons.forEach(lesson => { %>
+              <option value="<%= lesson.ID_LESSON %>"><%= new Date(lesson.LESSON_DATE).toLocaleDateString('he-IL') %> - <%= lesson.Name_Course %></option>
+            <% }); %>
+          </select>
+          <table>
+            <thead>
+              <tr>
+                <th>סטודנט</th>
+                <th>נוכח</th>
+                <th>לא נוכח</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% students.forEach(student => { %>
+                <tr>
+                  <td><%= student.NAME_STUDENT %></td>
+                  <td>
+                    <input type="radio" name="attendance[<%= student.ID_ %>]" value="1" required> נוכח
+                  </td>
+                  <td>
+                    <input type="radio" name="attendance[<%= student.ID_ %>]" value="0" required> לא נוכח
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <button type="submit" class="btn-submit">שמור נוכחות</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- Students Tab -->
+    <div id="students" class="tab-content">
+      <section>
+        <div class="section-header">
+          <h2>רשימת תלמידים</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>שם</th>
+              <th>אימייל</th>
+              <th>טלפון</th>
             </tr>
           </thead>
           <tbody>
             <% students.forEach(student => { %>
               <tr>
                 <td><%= student.NAME_STUDENT %></td>
-                <td>
-                  <input type="radio" name="attendance[<%= student.ID_ %>]" value="1" required> נוכח
-                </td>
-                <td>
-                  <input type="radio" name="attendance[<%= student.ID_ %>]" value="0" required> לא נוכח
-                </td>
+                <td><%= student.email || 'לא זמין' %></td>
+                <td><%= student.phone || 'לא זמין' %></td>
               </tr>
             <% }); %>
           </tbody>
         </table>
-        <button type="submit" class="btn-submit">שמור נוכחות</button>
-      </form>
-    </section>
+      </section>
+    </div>
+
+    <!-- Homework Modal -->
+    <div id="homeworkModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeHomeworkModal()">&times;</span>
+        <h2>יצירת עבודת בית חדשה</h2>
+        <form id="createHomeworkForm">
+          <label for="homeworkCourseSelect">בחר קורס:</label>
+          <select name="courseId" id="homeworkCourseSelect" required>
+            <% courses.forEach(course => { %>
+              <option value="<%= course.ID_COURSE %>"><%= course.Name_Course %></option>
+            <% }); %>
+          </select>
+          <label for="homeworkTitle">כותרת העבודה:</label>
+          <input type="text" name="homeworkTitle" id="homeworkTitle" required>
+          <label for="homeworkDeadline">תאריך הגשה:</label>
+          <input type="date" name="deadline" id="homeworkDeadline" required>
+          <button type="submit" class="btn-submit">צור עבודה</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Grade Homework Modal -->
+    <div id="gradeModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeGradeModal()">&times;</span>
+        <h2>מתן ציון לעבודה</h2>
+        <form id="gradeHomeworkForm">
+          <input type="hidden" id="submissionId" name="submissionId">
+          <label for="grade">ציון (0-100):</label>
+          <input type="number" name="grade" id="grade" min="0" max="100" required>
+          <button type="submit" class="btn-submit">שמור ציון</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Submissions Modal -->
+    <div id="submissionsModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeSubmissionsModal()">&times;</span>
+        <h2>הגשות עבודה</h2>
+        <div id="submissionsContent">
+          <table id="submissionsTable">
+            <thead>
+              <tr>
+                <th>תלמיד</th>
+                <th>תאריך הגשה</th>
+                <th>ציון</th>
+                <th>פעולות</th>
+              </tr>
+            </thead>
+            <tbody id="submissionsTableBody">
+              <!-- Will be filled dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </main>
+
   <script>
+    // Tab functionality
+    function openTab(evt, tabName) {
+      const tabContents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove("active");
+      }
+      
+      const tabs = document.getElementsByClassName("tab");
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove("active");
+      }
+      
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+    }
+
+    // Homework modal
+    function openHomeworkModal() {
+      document.getElementById("homeworkModal").style.display = "block";
+    }
+    
+    function closeHomeworkModal() {
+      document.getElementById("homeworkModal").style.display = "none";
+    }
+
+    // Grade modal
+    function gradeHomework(submissionId) {
+      document.getElementById("submissionId").value = submissionId;
+      document.getElementById("gradeModal").style.display = "block";
+    }
+    
+    function closeGradeModal() {
+      document.getElementById("gradeModal").style.display = "none";
+    }
+
+    // Submissions modal
+    function viewSubmissions(homeworkId) {
+      fetch(`/teacher/view-submissions/${homeworkId}`)
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.getElementById("submissionsTableBody");
+          tableBody.innerHTML = "";
+          
+          if (data.length === 0) {
+            tableBody.innerHTML = "<tr><td colspan='4'>אין הגשות לעבודה זו</td></tr>";
+          } else {
+            data.forEach(submission => {
+              const row = document.createElement("tr");
+              
+              const studentCell = document.createElement("td");
+              studentCell.textContent = submission.NAME_STUDENT;
+              row.appendChild(studentCell);
+              
+              const dateCell = document.createElement("td");
+              dateCell.textContent = new Date(submission.SUBMISSION_DATE).toLocaleDateString('he-IL');
+              row.appendChild(dateCell);
+              
+              const gradeCell = document.createElement("td");
+              gradeCell.textContent = submission.MARKS_RECEIVED !== null ? submission.MARKS_RECEIVED : 'טרם נבדק';
+              row.appendChild(gradeCell);
+              
+              const actionsCell = document.createElement("td");
+              
+              const downloadLink = document.createElement("a");
+              downloadLink.href = `/teacher/download-submission/${submission.ID_SUBMISSION}`;
+              downloadLink.className = "btn-action btn-secondary";
+              downloadLink.textContent = "הורדה";
+              downloadLink.style.marginRight = "5px";
+              actionsCell.appendChild(downloadLink);
+              
+              if (submission.MARKS_RECEIVED === null) {
+                const gradeButton = document.createElement("button");
+                gradeButton.className = "btn-action";
+                gradeButton.textContent = "מתן ציון";
+                gradeButton.onclick = function() {
+                  closeSubmissionsModal();
+                  gradeHomework(submission.ID_SUBMISSION);
+                };
+                actionsCell.appendChild(gradeButton);
+              }
+              
+              row.appendChild(actionsCell);
+              tableBody.appendChild(row);
+            });
+          }
+          
+          document.getElementById("submissionsModal").style.display = "block";
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('שגיאה בטעינת ההגשות');
+        });
+    }
+    
+    function closeSubmissionsModal() {
+      document.getElementById("submissionsModal").style.display = "none";
+    }
+
+    // Attendance form submission
     document.getElementById('markAttendanceForm').addEventListener('submit', async function(event) {
       event.preventDefault();
       const form = event.target;
@@ -185,6 +474,79 @@
         alert('הייתה בעיה בשמירת הנוכחות.');
       }
     });
+
+    // Create homework form submission
+    document.getElementById('createHomeworkForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const jsonData = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch('/teacher/create-homework', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jsonData)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert(data.message);
+          closeHomeworkModal();
+          location.reload(); // Reload to show the new homework
+        } else {
+          alert('הייתה בעיה ביצירת העבודה.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('הייתה בעיה ביצירת העבודה.');
+      }
+    });
+
+    // Grade homework form submission
+    document.getElementById('gradeHomeworkForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const jsonData = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch('/teacher/grade-homework', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jsonData)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert(data.message);
+          closeGradeModal();
+          location.reload(); // Reload to update the UI
+        } else {
+          alert('הייתה בעיה במתן הציון.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('הייתה בעיה במתן הציון.');
+      }
+    });
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+      if (event.target == document.getElementById("homeworkModal")) {
+        closeHomeworkModal();
+      }
+      if (event.target == document.getElementById("gradeModal")) {
+        closeGradeModal();
+      }
+      if (event.target == document.getElementById("submissionsModal")) {
+        closeSubmissionsModal();
+      }
+    }
   </script>
 </body>
 </html>

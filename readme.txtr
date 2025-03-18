@@ -1,0 +1,13 @@
+How to Access:
+Admin Account:
+
+Username: admin@admin.com
+Password: admin
+Student Accounts:
+
+Example: adam@example.com / student6789
+All student passwords follow the pattern: student + last 4 digits of ID
+Teacher Accounts:
+
+Example: david@example.com / teacher2333
+All teacher passwords follow the pattern: teacher + last 4 digits of ID

@@ -230,18 +230,113 @@ router.post('/register-student-course', async (req, res) => {
   }
   
   try {
-    const promises = studentIds.map(studentId => {
-      const query = `INSERT INTO REGISTRATION_FOR_COURSE (ID_STUDENT, ID_COURSE) VALUES (${studentId}, ${courseId})`;
-      return dbFun.updateData(query);
+    // Get course schedule
+    const courseScheduleQuery = `
+      SELECT LESSON.LESSON_DATE, LESSON.start_time, LESSON.end_time
+      FROM LESSON
+      WHERE LESSON.ID_COURSE = ${courseId}
+    `;
+    const courseSchedule = await dbFun.get_data(courseScheduleQuery);
+    
+    // Process each student
+    const results = [];
+    
+    for (const studentId of studentIds) {
+      // Check for schedule conflicts
+      const conflicts = await checkScheduleConflicts(studentId, courseId, courseSchedule);
+      
+      if (conflicts.length > 0) {
+        // There are conflicts
+        results.push({
+          studentId,
+          success: false,
+          conflicts
+        });
+      } else {
+        // No conflicts, register the student
+        const query = `INSERT INTO REGISTRATION_FOR_COURSE (ID_STUDENT, ID_COURSE) VALUES (${studentId}, ${courseId})`;
+        await dbFun.updateData(query);
+        results.push({
+          studentId,
+          success: true
+        });
+      }
+    }
+    
+    res.status(200).json({
+      message: "Registration process completed.",
+      results
     });
-
-    await Promise.all(promises);
-    res.status(200).json({ message: "Students registered successfully." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// Function to check for schedule conflicts
+async function checkScheduleConflicts(studentId, newCourseId, newCourseSchedule) {
+  // Get student's current courses
+  const studentCoursesQuery = `
+    SELECT COURSE.ID_COURSE, COURSE.Name_Course
+    FROM REGISTRATION_FOR_COURSE
+    JOIN COURSE ON REGISTRATION_FOR_COURSE.ID_COURSE = COURSE.ID_COURSE
+    WHERE REGISTRATION_FOR_COURSE.ID_STUDENT = ${studentId}
+  `;
+  const studentCourses = await dbFun.get_data(studentCoursesQuery);
+  
+  // If student has no courses, there can't be conflicts
+  if (studentCourses.length === 0) {
+    return [];
+  }
+  
+  // Get schedules for all student's courses
+  const conflicts = [];
+  
+  for (const course of studentCourses) {
+    // Skip if it's the same course (shouldn't happen, but just in case)
+    if (course.ID_COURSE === newCourseId) {
+      continue;
+    }
+    
+    // Get this course's schedule
+    const courseScheduleQuery = `
+      SELECT LESSON.LESSON_DATE, LESSON.start_time, LESSON.end_time, COURSE.Name_Course
+      FROM LESSON
+      JOIN COURSE ON LESSON.ID_COURSE = COURSE.ID_COURSE
+      WHERE LESSON.ID_COURSE = ${course.ID_COURSE}
+    `;
+    const existingSchedule = await dbFun.get_data(courseScheduleQuery);
+    
+    // Check for conflicts between this course and the new course
+    for (const newLesson of newCourseSchedule) {
+      for (const existingLesson of existingSchedule) {
+        // Check if lessons are on the same day
+        if (newLesson.LESSON_DATE === existingLesson.LESSON_DATE) {
+          // Parse times to compare
+          const newStart = new Date(`2000-01-01T${newLesson.start_time}`);
+          const newEnd = new Date(`2000-01-01T${newLesson.end_time}`);
+          const existingStart = new Date(`2000-01-01T${existingLesson.start_time}`);
+          const existingEnd = new Date(`2000-01-01T${existingLesson.end_time}`);
+          
+          // Check for overlap
+          if ((newStart <= existingEnd && existingStart <= newEnd)) {
+            conflicts.push({
+              date: newLesson.LESSON_DATE,
+              existingCourse: existingLesson.Name_Course,
+              existingTime: `${existingLesson.start_time} - ${existingLesson.end_time}`,
+              newTime: `${newLesson.start_time} - ${newLesson.end_time}`
+            });
+            
+            // Break out of inner loop once a conflict is found for this lesson
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  return conflicts;
+}
 
 // פונקציה לניקוי משתמשים כפול\ים ב-Management.js
 router.get('/clean-duplicate-users', async (req, res) => {

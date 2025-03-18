@@ -6,89 +6,430 @@
   <title>עמוד תלמיד</title>
   <link rel="stylesheet" href="/css/student.css">
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <a href="/logout" class="logout-button">יציאה</a>
-
   <header>
-    <h1>ברוך הבא, <span id="student-name"><%= studentName %></span></h1> 
+    <h1>ברוך הבא, <span id="student-name"><%= studentName %></span></h1>
+    <a href="/logout" class="logout-button">
+      <i class="fas fa-sign-out-alt"></i> יציאה
+    </a>
   </header>
 
   <main>
-    <!-- قسم רשימת الكورسات -->
-    <section class="courses-section">
-      <h2>רשימת קורסים</h2>
-      <div class="courses-grid">
-        <% courses.forEach(course => { %>
-          <div class="course-card">
-            <a href="/student/course/<%= course.ID_COURSE %>">
-              <h3><%= course.Name_Course %></h3>
-              <p><%= course.infromation || 'אין תיאור' %></p>
-              <p>תאריך השיעור: <%= new Date(course.LESSON_DATE).toLocaleDateString('he-IL') %></p>
-            </a>
-          </div>
-        <% }) %>
+    <div class="tabs">
+      <div class="tab active" onclick="openTab(event, 'dashboard')">
+        <i class="fas fa-tachometer-alt"></i> לוח בקרה
       </div>
-    </section>
+      <div class="tab" onclick="openTab(event, 'courses')">
+        <i class="fas fa-book"></i> קורסים
+      </div>
+      <div class="tab" onclick="openTab(event, 'schedule')">
+        <i class="fas fa-calendar-alt"></i> מערכת שעות
+      </div>
+      <div class="tab" onclick="openTab(event, 'homework')">
+        <i class="fas fa-tasks"></i> עבודות בית
+      </div>
+      <div class="tab" onclick="openTab(event, 'attendance')">
+        <i class="fas fa-user-check"></i> נוכחות
+      </div>
+    </div>
 
-    <!-- قسم לוח שבועי -->
-    <section class="schedule-section">
-      <h2>רשימה שבועית</h2>
-      <div class="schedule-table">
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+      <% if (conflicts && conflicts.length > 0) { %>
+        <section class="conflict-alert">
+          <h3><i class="fas fa-exclamation-triangle"></i> שים לב! נמצאו חפיפות במערכת השעות שלך:</h3>
+          <% conflicts.forEach(conflict => { %>
+            <div class="conflict-item">
+              <p><strong><i class="fas fa-calendar-day"></i> תאריך:</strong> <%= new Date(conflict.date).toLocaleDateString('he-IL') %></p>
+              <p><strong><i class="fas fa-book"></i> קורס 1:</strong> <%= conflict.course1 %> (<%= conflict.time1 %>)</p>
+              <p><strong><i class="fas fa-book"></i> קורס 2:</strong> <%= conflict.course2 %> (<%= conflict.time2 %>)</p>
+            </div>
+          <% }); %>
+        </section>
+      <% } %>
+
+      <section>
+        <h2><i class="fas fa-calendar-check"></i> שיעורים קרובים</h2>
         <table>
           <thead>
             <tr>
               <th>תאריך</th>
-              <th>שם קורס</th>
-              <th>שעת התחלה</th>
-              <th>שעת סיום</th>
+              <th>קורס</th>
+              <th>שעות</th>
             </tr>
           </thead>
           <tbody>
-            <% const lesson="" %>
-            <% schedule.forEach(course => { %>
-              <% const lessonDate = new Date(course.LESSON_DATE); %>
-              <% const today = new Date(); %>
-              <% const daysAhead = (lessonDate - today) / (1000 * 60 * 60 * 24); %>
-              <% if (daysAhead >= 0 && daysAhead <= 7)  { %>
+            <%
+              const today = new Date();
+              const upcomingLessons = schedule.filter(course => {
+                const lessonDate = new Date(course.LESSON_DATE);
+                return lessonDate >= today;
+              }).slice(0, 5);
+            %>
+            <% if (upcomingLessons.length > 0) { %>
+              <% upcomingLessons.forEach(course => { %>
                 <tr>
-                  <td><%= lessonDate.toLocaleDateString('he-IL') %></td>
+                  <td><%= new Date(course.LESSON_DATE).toLocaleDateString('he-IL') %></td>
                   <td><%= course.Name_Course %></td>
-                  <td><%= course.start_time %></td>
-                  <td><%= course.end_time %></td>
+                  <td><i class="far fa-clock"></i> <%= course.start_time %> - <%= course.end_time %></td>
                 </tr>
-              <% } %>
-            <% }) %>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="3" style="text-align: center;">אין שיעורים קרובים</td>
+              </tr>
+            <% } %>
           </tbody>
         </table>
-      </div>
-    </section>
-    
-    <!-- Section for 7-day calendar -->
-    <section class="calendar-section">
-      <h2> מערכת לשבוע הקרוב</h2>
-      <div class="calendar-grid">
-        <% const today = new Date(); %>
-        <% for (let i = 0; i < 7; i++) { %>
-          <% const day = new Date(today); %>
-          <% day.setDate(today.getDate() + i); %>
-          <div class="calendar-day">
-            <h3><%= day.toLocaleDateString('he-IL') %></h3>
-            <ul>
-              <% schedule.forEach(course => { %>
-                <% const lessonDate = new Date(course.LESSON_DATE); %>
-                <% if (lessonDate.toDateString() === day.toDateString()) { %>
-                  <li>
-                    <strong><%= course.Name_Course %></strong>
-                    <p><%= course.start_time %> - <%= course.end_time %></p>
-                  </li>
-                <% } %>
-              <% }) %>
-            </ul>
+      </section>
+
+      <section>
+        <h2><i class="fas fa-clipboard-list"></i> עבודות להגשה</h2>
+        <%
+          const pendingHomeworks = homeworks.filter(hw => !hw.ID_SUBMISSION && new Date(hw.DEADLINE) >= today);
+          const upcomingDeadlines = pendingHomeworks.sort((a, b) => new Date(a.DEADLINE) - new Date(b.DEADLINE)).slice(0, 3);
+        %>
+        <% if (upcomingDeadlines.length > 0) { %>
+          <% upcomingDeadlines.forEach(homework => { %>
+            <div class="homework-item">
+              <h3><%= homework.HOMEWORKLBL %></h3>
+              <div class="homework-meta">
+                <span><i class="fas fa-book"></i> קורס: <%= homework.Name_Course %></span>
+                <span><i class="fas fa-calendar-day"></i> תאריך הגשה: <%= new Date(homework.DEADLINE).toLocaleDateString('he-IL') %></span>
+              </div>
+              <a href="/student/course/<%= homework.ID_COURSE %>" class="btn">
+                <i class="fas fa-external-link-alt"></i> לעמוד הקורס
+              </a>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="empty-state">
+            <i class="fas fa-check-circle"></i>
+            <p>אין עבודות להגשה בקרוב</p>
           </div>
         <% } %>
-      </div>
-    </section>
+      </section>
+    </div>
+
+    <!-- Courses Tab -->
+    <div id="courses" class="tab-content">
+      <section class="courses-section">
+        <h2><i class="fas fa-book"></i> רשימת קורסים</h2>
+        <div class="courses-grid">
+          <% if (courses && courses.length > 0) { %>
+            <% courses.forEach(course => { %>
+              <div class="course-card">
+                <a href="/student/course/<%= course.ID_COURSE %>">
+                  <h3><i class="fas fa-graduation-cap"></i> <%= course.Name_Course %></h3>
+                  <p><%= course.infromation || 'אין תיאור' %></p>
+                  <div class="course-card-footer">
+                    <span><i class="fas fa-arrow-left"></i> לפרטים נוספים</span>
+                  </div>
+                </a>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-state">
+              <i class="fas fa-info-circle"></i>
+              <p>אין קורסים רשומים</p>
+            </div>
+          <% } %>
+        </div>
+      </section>
+    </div>
+
+    <!-- Schedule Tab -->
+    <div id="schedule" class="tab-content">
+      <section class="schedule-section">
+        <h2><i class="fas fa-calendar-week"></i> מערכת שעות שבועית</h2>
+        <div class="schedule-table">
+          <table>
+            <thead>
+              <tr>
+                <th><i class="fas fa-calendar-day"></i> יום</th>
+                <th><i class="fas fa-calendar"></i> תאריך</th>
+                <th><i class="fas fa-book"></i> קורס</th>
+                <th><i class="fas fa-hourglass-start"></i> שעת התחלה</th>
+                <th><i class="fas fa-hourglass-end"></i> שעת סיום</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%
+                const weeklySchedule = schedule.filter(course => {
+                  const lessonDate = new Date(course.LESSON_DATE);
+                  const daysAhead = (lessonDate - today) / (1000 * 60 * 60 * 24);
+                  return daysAhead >= 0 && daysAhead <= 7;
+                }).sort((a, b) => new Date(a.LESSON_DATE) - new Date(b.LESSON_DATE));
+              %>
+              <% if (weeklySchedule.length > 0) { %>
+                <% weeklySchedule.forEach(course => { %>
+                  <% const lessonDate = new Date(course.LESSON_DATE); %>
+                  <tr>
+                    <td><%= ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'][lessonDate.getDay()] %></td>
+                    <td><%= lessonDate.toLocaleDateString('he-IL') %></td>
+                    <td><%= course.Name_Course %></td>
+                    <td><%= course.start_time %></td>
+                    <td><%= course.end_time %></td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5" style="text-align: center;">אין שיעורים בשבוע הקרוב</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      
+      <section class="calendar-section">
+        <h2><i class="fas fa-calendar-alt"></i> לוח שבועי</h2>
+        <div class="calendar-grid">
+          <%
+            const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+            for (let i = 0; i < 7; i++) {
+              const day = new Date(today);
+              day.setDate(today.getDate() + i);
+          %>
+            <div class="calendar-day">
+              <h3>
+                <i class="fas fa-calendar-day"></i> <%= days[day.getDay()] %>
+                <br><%= day.toLocaleDateString('he-IL') %>
+              </h3>
+              <ul>
+                <%
+                  const dayLessons = schedule.filter(course => {
+                    const lessonDate = new Date(course.LESSON_DATE);
+                    return lessonDate.toDateString() === day.toDateString();
+                  });
+                %>
+                <% if (dayLessons.length > 0) { %>
+                  <% dayLessons.forEach(course => { %>
+                    <li>
+                      <strong><i class="fas fa-book"></i> <%= course.Name_Course %></strong>
+                      <p><i class="far fa-clock"></i> <%= course.start_time %> - <%= course.end_time %></p>
+                    </li>
+                  <% }); %>
+                <% } else { %>
+                  <li class="no-lessons"><i class="fas fa-coffee"></i> אין שיעורים</li>
+                <% } %>
+              </ul>
+            </div>
+          <% } %>
+        </div>
+      </section>
+    </div>
+
+    <!-- Homework Tab -->
+    <div id="homework" class="tab-content">
+      <section>
+        <h2><i class="fas fa-tasks"></i> עבודות בית</h2>
+        <%
+          // Group homeworks by status
+          const pendingHomeworksList = homeworks.filter(hw => !hw.ID_SUBMISSION && new Date(hw.DEADLINE) >= today);
+          const submittedHomeworks = homeworks.filter(hw => hw.ID_SUBMISSION && hw.MARKS_RECEIVED === null);
+          const gradedHomeworks = homeworks.filter(hw => hw.ID_SUBMISSION && hw.MARKS_RECEIVED !== null);
+          const lateHomeworks = homeworks.filter(hw => !hw.ID_SUBMISSION && new Date(hw.DEADLINE) < today);
+        %>
+
+        <% if (pendingHomeworksList.length > 0) { %>
+          <h3><i class="fas fa-hourglass-half"></i> עבודות להגשה</h3>
+          <% pendingHomeworksList.forEach(homework => { %>
+            <div class="homework-item">
+              <h3><%= homework.HOMEWORKLBL %></h3>
+              <div class="homework-meta">
+                <span><i class="fas fa-book"></i> קורס: <%= homework.Name_Course %></span>
+                <span><i class="fas fa-calendar-day"></i> תאריך הגשה: <%= new Date(homework.DEADLINE).toLocaleDateString('he-IL') %></span>
+              </div>
+              <span class="homework-status status-pending"><i class="fas fa-clock"></i> ממתין להגשה</span>
+              <p>
+                <a href="/student/course/<%= homework.ID_COURSE %>" class="btn">
+                  <i class="fas fa-upload"></i> הגש עבודה
+                </a>
+              </p>
+            </div>
+          <% }); %>
+        <% } %>
+
+        <% if (submittedHomeworks.length > 0) { %>
+          <h3><i class="fas fa-paper-plane"></i> עבודות שהוגשו</h3>
+          <% submittedHomeworks.forEach(homework => { %>
+            <div class="homework-item">
+              <h3><%= homework.HOMEWORKLBL %></h3>
+              <div class="homework-meta">
+                <span><i class="fas fa-book"></i> קורס: <%= homework.Name_Course %></span>
+                <span><i class="fas fa-calendar-day"></i> תאריך הגשה: <%= new Date(homework.DEADLINE).toLocaleDateString('he-IL') %></span>
+                <span><i class="fas fa-calendar-check"></i> הוגש בתאריך: <%= new Date(homework.SUBMISSION_DATE).toLocaleDateString('he-IL') %></span>
+              </div>
+              <span class="homework-status status-submitted"><i class="fas fa-check-circle"></i> הוגש - ממתין לבדיקה</span>
+              <p>
+                <a href="/student/course/<%= homework.ID_COURSE %>" class="btn btn-secondary">
+                  <i class="fas fa-sync-alt"></i> הגש מחדש
+                </a>
+              </p>
+            </div>
+          <% }); %>
+        <% } %>
+
+        <% if (gradedHomeworks.length > 0) { %>
+          <h3><i class="fas fa-check-double"></i> עבודות שנבדקו</h3>
+          <% gradedHomeworks.forEach(homework => { %>
+            <div class="homework-item">
+              <h3><%= homework.HOMEWORKLBL %></h3>
+              <div class="homework-meta">
+                <span><i class="fas fa-book"></i> קורס: <%= homework.Name_Course %></span>
+                <span><i class="fas fa-calendar-day"></i> תאריך הגשה: <%= new Date(homework.DEADLINE).toLocaleDateString('he-IL') %></span>
+                <span><i class="fas fa-calendar-check"></i> הוגש בתאריך: <%= new Date(homework.SUBMISSION_DATE).toLocaleDateString('he-IL') %></span>
+              </div>
+              <span class="homework-status status-graded"><i class="fas fa-award"></i> ציון: <%= homework.MARKS_RECEIVED %></span>
+            </div>
+          <% }); %>
+        <% } %>
+
+        <% if (lateHomeworks.length > 0) { %>
+          <h3><i class="fas fa-exclamation-triangle"></i> עבודות שלא הוגשו בזמן</h3>
+          <% lateHomeworks.forEach(homework => { %>
+            <div class="homework-item">
+              <h3><%= homework.HOMEWORKLBL %></h3>
+              <div class="homework-meta">
+                <span><i class="fas fa-book"></i> קורס: <%= homework.Name_Course %></span>
+                <span><i class="fas fa-calendar-day"></i> תאריך הגשה: <%= new Date(homework.DEADLINE).toLocaleDateString('he-IL') %></span>
+              </div>
+              <span class="homework-status status-late"><i class="fas fa-exclamation-circle"></i> איחור בהגשה</span>
+              <p>
+                <a href="/student/course/<%= homework.ID_COURSE %>" class="btn">
+                  <i class="fas fa-upload"></i> הגש באיחור
+                </a>
+              </p>
+            </div>
+          <% }); %>
+        <% } %>
+
+        <% if (pendingHomeworksList.length === 0 && submittedHomeworks.length === 0 && gradedHomeworks.length === 0 && lateHomeworks.length === 0) { %>
+          <div class="empty-state">
+            <i class="fas fa-check-circle"></i>
+            <p>אין עבודות בית</p>
+          </div>
+        <% } %>
+      </section>
+    </div>
+
+    <!-- Attendance Tab -->
+    <div id="attendance" class="tab-content">
+      <section>
+        <h2><i class="fas fa-user-check"></i> סיכום נוכחות</h2>
+        <%
+          const totalClasses = attendance.length;
+          const presentCount = attendance.filter(a => a.PRESENT === 1).length;
+          const absentCount = totalClasses - presentCount;
+          const attendanceRate = totalClasses > 0 ? Math.round((presentCount / totalClasses) * 100) : 0;
+        %>
+        <div class="attendance-summary">
+          <div class="attendance-stat">
+            <h3><i class="fas fa-chalkboard"></i> שיעורים סה"כ</h3>
+            <p><%= totalClasses %></p>
+          </div>
+          <div class="attendance-stat">
+            <h3><i class="fas fa-user-check"></i> נוכחות</h3>
+            <p><%= presentCount %></p>
+          </div>
+          <div class="attendance-stat">
+            <h3><i class="fas fa-user-times"></i> היעדרות</h3>
+            <p><%= absentCount %></p>
+          </div>
+          <div class="attendance-stat">
+            <h3><i class="fas fa-percentage"></i> אחוז נוכחות</h3>
+            <p><%= attendanceRate %>%</p>
+            <div class="progress-bar" data-value="<%= attendanceRate %>%">
+              <div class="progress"></div>
+            </div>
+          </div>
+        </div>
+
+        <h3><i class="fas fa-history"></i> היסטוריית נוכחות</h3>
+        <div class="attendance-list">
+          <% if (attendance && attendance.length > 0) { %>
+            <% attendance.forEach(record => { %>
+              <div class="attendance-item">
+                <div>
+                  <strong><i class="fas fa-book"></i> <%= record.Name_Course %></strong>
+                  <span><i class="fas fa-calendar-day"></i> <%= new Date(record.LESSON_DATE).toLocaleDateString('he-IL') %></span>
+                </div>
+                <div class="<%= record.PRESENT === 1 ? 'attendance-present' : 'attendance-absent' %>">
+                  <% if (record.PRESENT === 1) { %>
+                    <i class="fas fa-check-circle"></i> נוכח
+                  <% } else { %>
+                    <i class="fas fa-times-circle"></i> לא נוכח
+                  <% } %>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-state">
+              <i class="fas fa-info-circle"></i>
+              <p>אין נתוני נוכחות</p>
+            </div>
+          <% } %>
+        </div>
+        
+        <p>
+          <a href="/student/attendance-history" class="btn">
+            <i class="fas fa-history"></i> צפייה בהיסטוריית נוכחות מלאה
+          </a>
+        </p>
+      </section>
+    </div>
   </main>
+
+  <script>
+    // Tab switching functionality
+    function openTab(evt, tabName) {
+      // Hide all tab contents
+      const tabContents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove("active");
+      }
+      
+      // Deactivate all tabs
+      const tabs = document.getElementsByClassName("tab");
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove("active");
+      }
+      
+      // Show the selected tab content and activate the tab
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+      
+      // Save the active tab to localStorage
+      localStorage.setItem('activeStudentTab', tabName);
+    }
+    
+    // Check if there's a saved tab in localStorage and activate it
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedTab = localStorage.getItem('activeStudentTab');
+      if (savedTab && document.getElementById(savedTab)) {
+        // Find the tab element
+        const tabs = document.getElementsByClassName("tab");
+        for (let i = 0; i < tabs.length; i++) {
+          if (tabs[i].getAttribute('onclick').includes(savedTab)) {
+            // Simulate a click on the saved tab
+            tabs[i].click();
+            break;
+          }
+        }
+      }
+      
+      // Initialize any animations or interactive elements
+      const progressBars = document.querySelectorAll('.progress');
+      progressBars.forEach(bar => {
+        // Add a small delay for a nice animation effect
+        setTimeout(() => {
+          bar.style.width = bar.parentElement.dataset.value || '0%';
+        }, 300);
+      });
+    });
+  </script>
 </body>
 </html>

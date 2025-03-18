@@ -1,47 +1,444 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <title>מידע על הקורס</title>
   <link rel="stylesheet" href="/css/course.css">
+  <style>
+    body {
+      font-family: 'Rubik', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 1.5rem 0;
+      position: relative;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background-color: white;
+      color: #4CAF50;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .tab {
+      padding: 1rem 2rem;
+      cursor: pointer;
+      font-weight: 500;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active {
+      border-bottom: 3px solid #4CAF50;
+      color: #4CAF50;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    section {
+      margin-bottom: 2rem;
+      background-color: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #4CAF50;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+      margin-top: 0;
+    }
+
+    .course-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .course-info-item {
+      margin-bottom: 1rem;
+    }
+
+    .course-info-item h3 {
+      margin-bottom: 0.5rem;
+      color: #4CAF50;
+    }
+
+    .course-info-item p {
+      margin: 0;
+    }
+
+    .homework-item {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .homework-item h3 {
+      margin-top: 0;
+      color: #4CAF50;
+    }
+
+    .homework-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .homework-status {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    .status-pending {
+      background-color: #ffecb3;
+      color: #ff8f00;
+    }
+
+    .status-submitted {
+      background-color: #e8f5e9;
+      color: #4CAF50;
+    }
+
+    .status-graded {
+      background-color: #e3f2fd;
+      color: #2196F3;
+    }
+
+    .status-late {
+      background-color: #ffebee;
+      color: #f44336;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .btn-secondary {
+      background-color: #2196F3;
+    }
+
+    .btn-secondary:hover {
+      background-color: #0b7dda;
+    }
+
+    .materials-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .material-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .material-item:last-child {
+      border-bottom: none;
+    }
+
+    .material-item a {
+      color: #2196F3;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .material-item a:hover {
+      text-decoration: underline;
+    }
+
+    .material-icon {
+      margin-left: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .lesson-item {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .lesson-date {
+      font-weight: bold;
+      color: #4CAF50;
+      margin-bottom: 0.5rem;
+    }
+
+    .lesson-time {
+      color: #666;
+    }
+
+    form {
+      margin-top: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .submission-info {
+      background-color: #e8f5e9;
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
   <header>
     <h1>מידע על הקורס: <%= course.Name_Course %></h1>
+    <a href="/student" class="back-button">חזרה לדף הראשי</a>
   </header>
   <main>
-    <section>
-      <h2>עבודות בית</h2>
-      <ul>
-        <% homeworks.forEach(homework => { %>
-          <li>
-            <strong>תיאור:</strong> <%= homework.HOMEWORKLBL %><br>
-            <strong>תאריך הגשה:</strong> <%= homework.DEADLINE %><br>
-            <% if (homework.grade) { %>
-              <strong>ציון:</strong> <%= homework.grade %>
-            <% } else { %>
-              <strong>ציון:</strong> טרם נבדק
-            <% } %>
-            <br>
-            <form action="/submit-homework" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="homeworkId" value="<%= homework.ID_HOMEWORK %>">
-              <input type="hidden" name="studentId" value="<%= studentId %>">
-              <label for="file">הגש עבודה:</label>
-              <input type="file" name="file" required>
-              <button type="submit">שלח</button>
-            </form>
-          </li>
-        <% }); %>
-      </ul>
-    </section>
-    <section>
-      <h2>חומרים מהמרצה</h2>
-      <ul>
-        <% materials.forEach(material => { %>
-          <li><a href="/uploads/<%= material.FILE_NAME %>"><%= material.FILE_NAME %></a></li>
-        <% }); %>
-      </ul>
-    </section>
+    <div class="tabs">
+      <div class="tab active" onclick="openTab(event, 'overview')">סקירה כללית</div>
+      <div class="tab" onclick="openTab(event, 'homework')">עבודות בית</div>
+      <div class="tab" onclick="openTab(event, 'materials')">חומרי לימוד</div>
+      <div class="tab" onclick="openTab(event, 'schedule')">מערכת שעות</div>
+    </div>
+
+    <!-- Overview Tab -->
+    <div id="overview" class="tab-content active">
+      <section>
+        <h2>פרטי הקורס</h2>
+        <div class="course-info">
+          <div class="course-info-item">
+            <h3>שם הקורס</h3>
+            <p><%= course.Name_Course %></p>
+          </div>
+          <div class="course-info-item">
+            <h3>תיאור</h3>
+            <p><%= course.infromation || 'אין תיאור' %></p>
+          </div>
+          <div class="course-info-item">
+            <h3>תאריך התחלה</h3>
+            <p><%= new Date(course.start_date).toLocaleDateString('he-IL') %></p>
+          </div>
+          <div class="course-info-item">
+            <h3>תאריך סיום</h3>
+            <p><%= new Date(course.end_date).toLocaleDateString('he-IL') %></p>
+          </div>
+          <div class="course-info-item">
+            <h3>שעת התחלה</h3>
+            <p><%= course.start_time %></p>
+          </div>
+          <div class="course-info-item">
+            <h3>שעת סיום</h3>
+            <p><%= course.end_time %></p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>סיכום</h2>
+        <div class="course-info">
+          <div class="course-info-item">
+            <h3>מספר עבודות בית</h3>
+            <p><%= homeworks.length %></p>
+          </div>
+          <div class="course-info-item">
+            <h3>מספר חומרי לימוד</h3>
+            <p><%= materials.length %></p>
+          </div>
+          <div class="course-info-item">
+            <h3>מספר שיעורים</h3>
+            <p><%= lessons.length %></p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Homework Tab -->
+    <div id="homework" class="tab-content">
+      <section>
+        <h2>עבודות בית</h2>
+        <% if (homeworks.length === 0) { %>
+          <p>אין עבודות בית לקורס זה</p>
+        <% } else { %>
+          <% homeworks.forEach(homework => { %>
+            <div class="homework-item">
+              <h3><%= homework.HOMEWORKLBL %></h3>
+              <div class="homework-meta">
+                <span>תאריך הגשה: <%= new Date(homework.DEADLINE).toLocaleDateString('he-IL') %></span>
+                <% if (homework.ID_SUBMISSION) { %>
+                  <span>הוגש בתאריך: <%= new Date(homework.SUBMISSION_DATE).toLocaleDateString('he-IL') %></span>
+                <% } %>
+              </div>
+              
+              <%
+                const today = new Date();
+                const deadline = new Date(homework.DEADLINE);
+                const isLate = today > deadline && !homework.ID_SUBMISSION;
+                
+                if (homework.MARKS_RECEIVED !== null) {
+              %>
+                <span class="homework-status status-graded">ציון: <%= homework.MARKS_RECEIVED %></span>
+              <% } else if (homework.ID_SUBMISSION) { %>
+                <span class="homework-status status-submitted">הוגש - ממתין לבדיקה</span>
+              <% } else if (isLate) { %>
+                <span class="homework-status status-late">איחור בהגשה</span>
+              <% } else { %>
+                <span class="homework-status status-pending">ממתין להגשה</span>
+              <% } %>
+              
+              <% if (homework.MARKS_RECEIVED === null) { %>
+                <form action="/student/submit-homework" method="post" enctype="multipart/form-data">
+                  <input type="hidden" name="homeworkId" value="<%= homework.ID_HOMEWORK %>">
+                  <input type="hidden" name="courseId" value="<%= course.ID_COURSE %>">
+                  <label for="file_<%= homework.ID_HOMEWORK %>">
+                    <%= homework.ID_SUBMISSION ? 'הגש מחדש:' : 'הגש עבודה:' %>
+                  </label>
+                  <input type="file" id="file_<%= homework.ID_HOMEWORK %>" name="file" required>
+                  <button type="submit" class="btn">
+                    <%= homework.ID_SUBMISSION ? 'הגש מחדש' : 'הגש' %>
+                  </button>
+                </form>
+                
+                <% if (homework.ID_SUBMISSION) { %>
+                  <div class="submission-info">
+                    <p>קובץ שהוגש: <%= homework.FILE_NAME %></p>
+                  </div>
+                <% } %>
+              <% } %>
+            </div>
+          <% }); %>
+        <% } %>
+      </section>
+    </div>
+
+    <!-- Materials Tab -->
+    <div id="materials" class="tab-content">
+      <section>
+        <h2>חומרי לימוד</h2>
+        <% if (materials.length === 0) { %>
+          <p>אין חומרי לימוד לקורס זה</p>
+        <% } else { %>
+          <ul class="materials-list">
+            <% materials.forEach(material => { %>
+              <li class="material-item">
+                <a href="/uploads/<%= material.FILE_NAME %>" target="_blank">
+                  <span class="material-icon">📄</span>
+                  <%= material.FILE_NAME %>
+                </a>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+      </section>
+    </div>
+
+    <!-- Schedule Tab -->
+    <div id="schedule" class="tab-content">
+      <section>
+        <h2>מערכת שעות</h2>
+        <% if (lessons.length === 0) { %>
+          <p>אין שיעורים מתוכננים לקורס זה</p>
+        <% } else { %>
+          <% lessons.forEach(lesson => { %>
+            <div class="lesson-item">
+              <div class="lesson-date">
+                <%= new Date(lesson.LESSON_DATE).toLocaleDateString('he-IL') %>
+                (<%= ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'][new Date(lesson.LESSON_DATE).getDay()] %>)
+              </div>
+              <div class="lesson-time">
+                <%= lesson.start_time %> - <%= lesson.end_time %>
+              </div>
+              <% if (lesson.LESSON_CONTENT) { %>
+                <div class="lesson-content">
+                  <h4>תוכן השיעור:</h4>
+                  <p><%= lesson.LESSON_CONTENT %></p>
+                </div>
+              <% } %>
+            </div>
+          <% }); %>
+        <% } %>
+      </section>
+    </div>
   </main>
+
+  <script>
+    function openTab(evt, tabName) {
+      const tabContents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove("active");
+      }
+      
+      const tabs = document.getElementsByClassName("tab");
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove("active");
+      }
+      
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+    }
+  </script>
 </body>
 </html>
