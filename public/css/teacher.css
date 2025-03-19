@@ -87,7 +87,7 @@ header h1 {
 
 /* Main Content */
 main {
-  max-width: 1200px;
+  max-width: 95vw;
   margin: 0 auto;
   padding: var(--spacing-xl);
 }
@@ -194,7 +194,7 @@ h3 {
 /* Grid Container */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(25%, 1fr));
   gap: var(--spacing-lg);
   margin-top: var(--spacing-lg);
 }
@@ -286,7 +286,7 @@ table tr:hover {
 }
 
 .time-column {
-  min-width: 80px;
+  min-width: 8%;
   border-left: 1px solid var(--border-color);
   background-color: rgba(76, 175, 80, 0.05);
 }
@@ -320,7 +320,7 @@ table tr:hover {
 
 .day-column {
   flex: 1;
-  min-width: 150px;
+  min-width: 15%;
   border-left: 1px solid var(--border-color);
 }
 
@@ -471,8 +471,7 @@ form input[type="number"]:focus {
   margin: 10% auto;
   padding: var(--spacing-xl);
   border-radius: var(--border-radius-lg);
-  width: 50%;
-  max-width: 600px;
+  width: 80%;
   position: relative;
   box-shadow: var(--shadow-lg);
   animation: slideIn 0.3s ease;

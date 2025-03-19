@@ -87,7 +87,7 @@ header h1 {
 
 /* Main Content */
 main {
-  max-width: 90vw;
+  max-width: 95vw;
   margin: 0 auto;
   padding: var(--spacing-xl);
 }
@@ -193,7 +193,7 @@ h3 {
 /* Course Cards */
 .courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(30%, 1fr));
   gap: var(--spacing-lg);
 }
 
@@ -290,7 +290,7 @@ table tr:hover {
 }
 
 .time-column {
-  min-width: 80px;
+  min-width: 8%;
   border-left: 1px solid var(--border-color);
   background-color: rgba(63, 81, 181, 0.05);
 }
@@ -330,7 +330,7 @@ table tr:hover {
 
 .day-column {
   flex: 1;
-  min-width: 150px;
+  min-width: 15%;
   border-left: 1px solid var(--border-color);
 }
 
@@ -512,7 +512,7 @@ table tr:hover {
   background-color: var(--background-white);
   border-radius: var(--border-radius-md);
   flex: 1;
-  min-width: 150px;
+  min-width: 15%;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
   transition: var(--transition-normal);
@@ -671,8 +671,7 @@ table tr:hover {
   margin: 10% auto;
   padding: var(--spacing-xl);
   border-radius: var(--border-radius-lg);
-  width: 50%;
-  max-width: 600px;
+  width: 80%;
   position: relative;
   box-shadow: var(--shadow-lg);
   animation: slideIn 0.3s ease;
