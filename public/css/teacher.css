@@ -274,46 +274,103 @@ table tr:hover {
   background-color: rgba(76, 175, 80, 0.05);
 }
 
-/* Schedule Container */
-.schedule-container {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: var(--spacing-md);
+/* Improved Schedule Container */
+.improved-schedule-container {
+  display: flex;
   margin-top: var(--spacing-lg);
   overflow-x: auto;
+  background-color: var(--background-white);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+}
+
+.time-column {
+  min-width: 80px;
+  border-left: 1px solid var(--border-color);
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+.time-header, .day-header {
+  text-align: center;
+  font-weight: bold;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--primary-color);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.time-slot {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.days-container {
+  display: flex;
+  flex: 1;
 }
 
 .day-column {
-  background-color: var(--background-white);
-  border-radius: var(--border-radius-md);
-  padding: var(--spacing-md);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
+  flex: 1;
   min-width: 150px;
+  border-left: 1px solid var(--border-color);
 }
 
-.day-header {
-  text-align: center;
-  font-weight: bold;
-  padding-bottom: var(--spacing-sm);
+.day-column:last-child {
+  border-left: none;
+}
+
+.day-lessons {
+  display: flex;
+  flex-direction: column;
+}
+
+.time-cell {
+  height: 60px;
   border-bottom: 1px solid var(--border-color);
-  margin-bottom: var(--spacing-md);
-  color: var(--primary-color);
+  padding: var(--spacing-xs);
+  position: relative;
 }
 
 .lesson-item {
   background-color: rgba(76, 175, 80, 0.1);
   border-radius: var(--border-radius-sm);
-  padding: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-xs);
   border-right: 3px solid var(--primary-color);
   transition: var(--transition-normal);
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .lesson-item:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
   background-color: rgba(76, 175, 80, 0.15);
+  z-index: 5;
+}
+
+.lesson-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
 }
 
 /* Forms */

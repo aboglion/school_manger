@@ -86,12 +86,27 @@
     </div>
 
     <!-- Schedule Tab -->
-    <div id="schedule" class="tab-content">
-      <section>
-        <div class="section-header">
-          <h2>מערכת שעות שבועית</h2>
+  <div id="schedule" class="tab-content">
+    <section>
+      <div class="section-header">
+        <h2>מערכת שעות שבועית</h2>
+      </div>
+      <div class="improved-schedule-container">
+        <div class="time-column">
+          <div class="time-header">שעות</div>
+          <%
+            // Define time slots
+            const timeSlots = [
+              "08:00", "09:00", "10:00", "11:00", "12:00",
+              "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"
+            ];
+          %>
+          <% timeSlots.forEach(time => { %>
+            <div class="time-slot"><%= time %></div>
+          <% }); %>
         </div>
-        <div class="schedule-container">
+        
+        <div class="days-container">
           <%
             const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
             const dayMap = {};
@@ -110,21 +125,35 @@
           <% days.forEach((day, index) => { %>
             <div class="day-column">
               <div class="day-header"><%= day %></div>
-              <% if (dayMap[index] && dayMap[index].length > 0) { %>
-                <% dayMap[index].forEach(lesson => { %>
-                  <div class="lesson-item">
-                    <div><strong><%= lesson.Name_Course %></strong></div>
-                    <div><%= lesson.start_time %> - <%= lesson.end_time %></div>
+              <div class="day-lessons">
+                <% timeSlots.forEach(timeSlot => { %>
+                  <div class="time-cell">
+                    <%
+                      // Find lessons that fall within this time slot
+                      const lessonsInSlot = dayMap[index] ? dayMap[index].filter(lesson => {
+                        const lessonStart = lesson.start_time.substring(0, 5);
+                        const lessonEnd = lesson.end_time.substring(0, 5);
+                        return lessonStart <= timeSlot && lessonEnd > timeSlot;
+                      }) : [];
+                    %>
+                    
+                    <% if (lessonsInSlot.length > 0) { %>
+                      <% lessonsInSlot.forEach(lesson => { %>
+                        <div class="lesson-item">
+                          <div class="lesson-title"><strong><%= lesson.Name_Course %></strong></div>
+                          <div class="lesson-time"><%= lesson.start_time %> - <%= lesson.end_time %></div>
+                        </div>
+                      <% }); %>
+                    <% } %>
                   </div>
                 <% }); %>
-              <% } else { %>
-                <div>אין שיעורים</div>
-              <% } %>
+              </div>
             </div>
           <% }); %>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
+  </div>
 
     <!-- Materials Tab -->
     <div id="materials" class="tab-content">

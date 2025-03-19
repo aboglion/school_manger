@@ -87,7 +87,7 @@ header h1 {
 
 /* Main Content */
 main {
-  max-width: 1200px;
+  max-width: 90vw;
   margin: 0 auto;
   padding: var(--spacing-xl);
 }
@@ -278,61 +278,113 @@ table tr:hover {
   background-color: rgba(63, 81, 181, 0.05);
 }
 
-/* Calendar */
-.calendar-section {
-  margin-top: var(--spacing-xl);
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: var(--spacing-md);
-}
-
-.calendar-day {
+/* Improved Schedule Container */
+.improved-schedule-container {
+  display: flex;
+  margin-top: var(--spacing-lg);
+  overflow-x: auto;
   background-color: var(--background-white);
   border-radius: var(--border-radius-md);
-  padding: var(--spacing-md);
-  box-shadow: var(--shadow-sm);
-  min-height: 150px;
-  border: 1px solid var(--border-color);
-  transition: var(--transition-normal);
-}
-
-.calendar-day:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  border: 1px solid var(--border-color);
 }
 
-.calendar-day h3 {
-  margin-top: 0;
+.time-column {
+  min-width: 80px;
+  border-left: 1px solid var(--border-color);
+  background-color: rgba(63, 81, 181, 0.05);
+}
+
+.time-header, .day-header {
   text-align: center;
-  font-size: 0.9rem;
-  color: var(--primary-color);
+  font-weight: bold;
+  padding: var(--spacing-md);
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: var(--spacing-sm);
+  background-color: var(--primary-color);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.calendar-day ul {
-  padding-left: 0;
-  list-style-type: none;
-  margin: var(--spacing-sm) 0 0 0;
+.day-date {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-top: 3px;
 }
 
-.calendar-day li {
-  margin-bottom: var(--spacing-sm);
-  font-size: 0.85rem;
-}
-
-.calendar-day li strong {
-  display: block;
-  margin-bottom: var(--spacing-xs);
-  color: var(--text-primary);
-}
-
-.calendar-day li p {
-  margin: 0;
+.time-slot {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-color);
   color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.days-container {
+  display: flex;
+  flex: 1;
+}
+
+.day-column {
+  flex: 1;
+  min-width: 150px;
+  border-left: 1px solid var(--border-color);
+}
+
+.day-column:last-child {
+  border-left: none;
+}
+
+.day-lessons {
+  display: flex;
+  flex-direction: column;
+}
+
+.time-cell {
+  height: 60px;
+  border-bottom: 1px solid var(--border-color);
+  padding: var(--spacing-xs);
+  position: relative;
+}
+
+.lesson-item {
+  background-color: rgba(63, 81, 181, 0.1);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-xs);
+  border-right: 3px solid var(--primary-color);
+  transition: var(--transition-normal);
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.lesson-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  background-color: rgba(63, 81, 181, 0.15);
+  z-index: 5;
+}
+
+.lesson-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.schedule-list-section {
+  margin-top: var(--spacing-xl);
 }
 
 /* Homework Items */

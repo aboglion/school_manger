@@ -221,52 +221,100 @@ router.get('/register-student-course', async (req, res) => {
   }
 });
 
-router.post('/register-student-course', async (req, res) => {
-  let { studentIds, courseId } = req.body;
+// Get student schedule
+router.get('/student-schedule/:studentId', async (req, res) => {
+  const studentId = req.params.studentId;
   
-  // Ensure studentIds is an array
-  if (!Array.isArray(studentIds)) {
-    studentIds = [studentIds];
+  try {
+    // Get student's courses
+    const studentCoursesQuery = `
+      SELECT COURSE.ID_COURSE, COURSE.Name_Course
+      FROM REGISTRATION_FOR_COURSE
+      JOIN COURSE ON REGISTRATION_FOR_COURSE.ID_COURSE = COURSE.ID_COURSE
+      WHERE REGISTRATION_FOR_COURSE.ID_STUDENT = ${studentId}
+    `;
+    const studentCourses = await dbFun.get_data(studentCoursesQuery);
+    
+    // Get all lessons for student's courses
+    let schedule = [];
+    
+    if (studentCourses.length > 0) {
+      const courseIds = studentCourses.map(course => course.ID_COURSE).join(',');
+      
+      const scheduleQuery = `
+        SELECT LESSON.ID_LESSON, LESSON.ID_COURSE, LESSON.LESSON_DATE, LESSON.start_time, LESSON.end_time, COURSE.Name_Course
+        FROM LESSON
+        JOIN COURSE ON LESSON.ID_COURSE = COURSE.ID_COURSE
+        WHERE LESSON.ID_COURSE IN (${courseIds})
+        ORDER BY LESSON.LESSON_DATE, LESSON.start_time
+      `;
+      
+      schedule = await dbFun.get_data(scheduleQuery);
+    }
+    
+    res.status(200).json({ schedule });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Get course schedule
+router.get('/course-schedule/:courseId', async (req, res) => {
+  const courseId = req.params.courseId;
+  
+  try {
+    const scheduleQuery = `
+      SELECT ID_LESSON, ID_COURSE, LESSON_DATE, start_time, end_time
+      FROM LESSON
+      WHERE ID_COURSE = ${courseId}
+      ORDER BY LESSON_DATE, start_time
+    `;
+    
+    const schedule = await dbFun.get_data(scheduleQuery);
+    
+    res.status(200).json({ schedule });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.post('/register-student-course', async (req, res) => {
+  const { studentId, courseId, lessonIds } = req.body;
+  
+  if (!studentId || !courseId || !lessonIds || !Array.isArray(lessonIds) || lessonIds.length === 0) {
+    return res.status(400).json({ error: "נתונים חסרים או לא תקינים" });
   }
   
   try {
-    // Get course schedule
-    const courseScheduleQuery = `
-      SELECT LESSON.LESSON_DATE, LESSON.start_time, LESSON.end_time
+    // Get lessons for the course
+    const lessonsQuery = `
+      SELECT ID_LESSON, LESSON_DATE, start_time, end_time
       FROM LESSON
-      WHERE LESSON.ID_COURSE = ${courseId}
+      WHERE ID_COURSE = ${courseId} AND ID_LESSON IN (${lessonIds.join(',')})
     `;
-    const courseSchedule = await dbFun.get_data(courseScheduleQuery);
+    const lessons = await dbFun.get_data(lessonsQuery);
     
-    // Process each student
-    const results = [];
+    // Check for schedule conflicts
+    const conflicts = await checkScheduleConflictsForLessons(studentId, courseId, lessons);
     
-    for (const studentId of studentIds) {
-      // Check for schedule conflicts
-      const conflicts = await checkScheduleConflicts(studentId, courseId, courseSchedule);
+    if (conflicts.length > 0) {
+      // There are conflicts
+      return res.status(200).json({
+        success: false,
+        conflicts
+      });
+    } else {
+      // No conflicts, register the student
+      const query = `INSERT INTO REGISTRATION_FOR_COURSE (ID_STUDENT, ID_COURSE) VALUES (${studentId}, ${courseId})`;
+      await dbFun.updateData(query);
       
-      if (conflicts.length > 0) {
-        // There are conflicts
-        results.push({
-          studentId,
-          success: false,
-          conflicts
-        });
-      } else {
-        // No conflicts, register the student
-        const query = `INSERT INTO REGISTRATION_FOR_COURSE (ID_STUDENT, ID_COURSE) VALUES (${studentId}, ${courseId})`;
-        await dbFun.updateData(query);
-        results.push({
-          studentId,
-          success: true
-        });
-      }
+      return res.status(200).json({
+        success: true,
+        lessonCount: lessons.length
+      });
     }
-    
-    res.status(200).json({
-      message: "Registration process completed.",
-      results
-    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -330,6 +378,113 @@ async function checkScheduleConflicts(studentId, newCourseId, newCourseSchedule)
             // Break out of inner loop once a conflict is found for this lesson
             break;
           }
+        }
+      }
+    }
+  }
+  
+  return conflicts;
+}
+
+// Function to check for schedule conflicts for specific lessons
+async function checkScheduleConflictsForLessons(studentId, newCourseId, selectedLessons) {
+  // Get student's current courses
+  const studentCoursesQuery = `
+    SELECT COURSE.ID_COURSE, COURSE.Name_Course
+    FROM REGISTRATION_FOR_COURSE
+    JOIN COURSE ON REGISTRATION_FOR_COURSE.ID_COURSE = COURSE.ID_COURSE
+    WHERE REGISTRATION_FOR_COURSE.ID_STUDENT = ${studentId}
+  `;
+  const studentCourses = await dbFun.get_data(studentCoursesQuery);
+  
+  // If student has no courses, there can't be conflicts
+  if (studentCourses.length === 0) {
+    return [];
+  }
+  
+  // Get course name for the new course
+  const courseQuery = `SELECT Name_Course FROM COURSE WHERE ID_COURSE = ${newCourseId}`;
+  const courseResult = await dbFun.get_data(courseQuery);
+  const newCourseName = courseResult[0]?.Name_Course || 'קורס חדש';
+  
+  // Get schedules for all student's courses
+  const conflicts = [];
+  
+  for (const course of studentCourses) {
+    // Skip if it's the same course (shouldn't happen, but just in case)
+    if (course.ID_COURSE === newCourseId) {
+      continue;
+    }
+    
+    // Get this course's schedule
+    const courseScheduleQuery = `
+      SELECT LESSON.LESSON_DATE, LESSON.start_time, LESSON.end_time, COURSE.Name_Course
+      FROM LESSON
+      JOIN COURSE ON LESSON.ID_COURSE = COURSE.ID_COURSE
+      WHERE LESSON.ID_COURSE = ${course.ID_COURSE}
+    `;
+    const existingSchedule = await dbFun.get_data(courseScheduleQuery);
+    
+    // Check for conflicts between selected lessons and existing schedule
+    for (const newLesson of selectedLessons) {
+      for (const existingLesson of existingSchedule) {
+        // Check if lessons are on the same day
+        if (newLesson.LESSON_DATE === existingLesson.LESSON_DATE) {
+          // Parse times to compare
+          const newStart = new Date(`2000-01-01T${newLesson.start_time}`);
+          const newEnd = new Date(`2000-01-01T${newLesson.end_time}`);
+          const existingStart = new Date(`2000-01-01T${existingLesson.start_time}`);
+          const existingEnd = new Date(`2000-01-01T${existingLesson.end_time}`);
+          
+          // Check for overlap
+          if ((newStart <= existingEnd && existingStart <= newEnd)) {
+            conflicts.push({
+              date: newLesson.LESSON_DATE,
+              existingCourse: existingLesson.Name_Course,
+              existingTime: `${existingLesson.start_time} - ${existingLesson.end_time}`,
+              newTime: `${newLesson.start_time} - ${newLesson.end_time}`
+            });
+            
+            // Break out of inner loop once a conflict is found for this lesson
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  // Also check for teacher conflicts
+  const teacherConflictsQuery = `
+    SELECT LESSON.LESSON_DATE, LESSON.start_time, LESSON.end_time, COURSE.Name_Course
+    FROM LESSON
+    JOIN COURSE ON LESSON.ID_COURSE = COURSE.ID_COURSE
+    WHERE COURSE.ID_TEACHER = (SELECT ID_TEACHER FROM COURSE WHERE ID_COURSE = ${newCourseId})
+    AND LESSON.ID_COURSE != ${newCourseId}
+  `;
+  const teacherSchedule = await dbFun.get_data(teacherConflictsQuery);
+  
+  // Check for conflicts between selected lessons and teacher's schedule
+  for (const newLesson of selectedLessons) {
+    for (const teacherLesson of teacherSchedule) {
+      // Check if lessons are on the same day
+      if (newLesson.LESSON_DATE === teacherLesson.LESSON_DATE) {
+        // Parse times to compare
+        const newStart = new Date(`2000-01-01T${newLesson.start_time}`);
+        const newEnd = new Date(`2000-01-01T${newLesson.end_time}`);
+        const teacherStart = new Date(`2000-01-01T${teacherLesson.start_time}`);
+        const teacherEnd = new Date(`2000-01-01T${teacherLesson.end_time}`);
+        
+        // Check for overlap
+        if ((newStart <= teacherEnd && teacherStart <= newEnd)) {
+          conflicts.push({
+            date: newLesson.LESSON_DATE,
+            existingCourse: `${teacherLesson.Name_Course} (המורה כבר מלמד)`,
+            existingTime: `${teacherLesson.start_time} - ${teacherLesson.end_time}`,
+            newTime: `${newLesson.start_time} - ${newLesson.end_time}`
+          });
+          
+          // Break out of inner loop once a conflict is found for this lesson
+          break;
         }
       }
     }
