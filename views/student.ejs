@@ -7,6 +7,66 @@
   <link rel="stylesheet" href="/css/student.css">
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared-schedule.css">
+  <style>
+    .schedule-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    #download-schedule-pdf {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s;
+    }
+    
+    #download-schedule-pdf:hover {
+      background-color: #45a049;
+    }
+    
+    /* Set regular cursor for lesson items */
+    .lesson-item {
+      cursor: default; /* Regular arrow cursor */
+    }
+    
+    /* Remove hover effects specifically for course names */
+    .lesson-title, .lesson-title:hover {
+      color: inherit !important; /* Keep original color */
+      text-decoration: none !important; /* Remove any underline */
+      font-weight: inherit !important; /* Keep original font weight */
+      transform: none !important; /* Prevent any transform */
+      transition: none !important; /* Disable transitions */
+    }
+    
+    /* Keep the tooltip but make it non-interactive */
+    .lesson-tooltip {
+      pointer-events: none;
+    }
+    
+    @media print {
+      .tabs, header, .tab:not(.active) {
+        display: none !important;
+      }
+      
+      .tab-content.active {
+        display: block !important;
+      }
+      
+      #download-schedule-pdf {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -143,11 +203,16 @@
     <!-- Schedule Tab -->
     <div id="schedule" class="tab-content">
       <section class="schedule-section">
-        <h2><i class="fas fa-calendar-week"></i> מערכת שעות שבועית</h2>
+        <div class="schedule-header">
+          <h2><i class="fas fa-calendar-week"></i> מערכת שעות שבועית</h2>
+          <button id="download-schedule-pdf" class="btn">
+            <i class="fas fa-file-pdf"></i> הורד מערכת שעות כ-PDF
+          </button>
+        </div>
         
         <div class="improved-schedule-container">
           <div class="time-column">
-            <div class="time-header"><i class="fas fa-clock"></i> שעות</div>
+            <div class="time-header"><i class="fas fa-clock"></i></div>
             <%
               // Define time slots
               const timeSlots = [
@@ -162,7 +227,7 @@
           
           <div class="days-container">
             <%
-              const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+              const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'];
               
               // Prepare the next 7 days
               const nextWeekDays = [];
@@ -176,7 +241,7 @@
             <% days.forEach((dayName, index) => { %>
               <div class="day-column">
                 <div class="day-header">
-                  <i class="fas fa-calendar-day"></i> <%= dayName %>
+                  <div><i class="fas fa-calendar-day"></i> <%= dayName %></div>
                   <div class="day-date"><%= nextWeekDays[index].toLocaleDateString('he-IL') %></div>
                 </div>
                 <div class="day-lessons">
@@ -191,15 +256,42 @@
                         
                         // Find lessons that fall within this time slot
                         const lessonsInSlot = dayLessons.filter(lesson => {
-                          const lessonStart = lesson.start_time.substring(0, 5);
-                          const lessonEnd = lesson.end_time.substring(0, 5);
-                          return lessonStart <= timeSlot && lessonEnd > timeSlot;
+                          // Get the hour part of the time slot (e.g., "08" from "08:00")
+                          const timeSlotHour = parseInt(timeSlot.split(':')[0]);
+                          
+                          // Get the hour parts of the lesson start and end times
+                          const lessonStartHour = parseInt(lesson.start_time.split(':')[0]);
+                          const lessonEndHour = parseInt(lesson.end_time.split(':')[0]);
+                          
+                          // Check if the time slot hour is within the lesson hours
+                          return lessonStartHour <= timeSlotHour && lessonEndHour > timeSlotHour;
                         });
                       %>
                       
                       <% if (lessonsInSlot.length > 0) { %>
                         <% lessonsInSlot.forEach(lesson => { %>
-                          <div class="lesson-item">
+                          <%
+                            // Debug: Log the lesson object to see what properties are available
+                            console.log("Lesson object:", lesson);
+                            
+                            // Get the course ID from the lesson object - check all possible property names
+                            const courseId = lesson.ID_COURSE || lesson.COURSE_ID || lesson.id_course || lesson.courseId || lesson.course_id;
+                            
+                            // Additional debugging to see what we're getting
+                            console.log("Course ID extracted:", courseId);
+                            
+                            // Ensure we have a valid course ID
+                            const validCourseId = courseId || '';
+                          %>
+                          <div class="lesson-item" data-course-id="<%= validCourseId %>">
+                            <div class="lesson-tooltip">
+                              <strong><%= lesson.Name_Course %></strong>
+                              <p>זמן: <%= lesson.start_time %> - <%= lesson.end_time %></p>
+                              <% if (lesson.infromation) { %>
+                                <p>מידע: <%= lesson.infromation %></p>
+                              <% } %>
+                              <small>לחץ לצפייה בדף הקורס</small>
+                            </div>
                             <div class="lesson-title"><i class="fas fa-book"></i> <%= lesson.Name_Course %></div>
                             <div class="lesson-time"><i class="far fa-clock"></i> <%= lesson.start_time %> - <%= lesson.end_time %></div>
                           </div>
@@ -239,7 +331,7 @@
                 <% weeklySchedule.forEach(course => { %>
                   <% const lessonDate = new Date(course.LESSON_DATE); %>
                   <tr>
-                    <td><%= ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'][lessonDate.getDay()] %></td>
+                    <td><%= ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'][lessonDate.getDay()] %></td>
                     <td><%= lessonDate.toLocaleDateString('he-IL') %></td>
                     <td><%= course.Name_Course %></td>
                     <td><%= course.start_time %></td>
@@ -418,7 +510,58 @@
     </div>
   </main>
 
+  <!-- Add html2pdf.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
   <script>
+    // PDF Download functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const downloadButton = document.getElementById('download-schedule-pdf');
+      if (downloadButton) {
+        downloadButton.addEventListener('click', function() {
+          // Get the schedule content
+          const scheduleContent = document.querySelector('.improved-schedule-container');
+          const scheduleList = document.querySelector('.schedule-list-section');
+          
+          // Create a container for the PDF content
+          const pdfContent = document.createElement('div');
+          pdfContent.style.direction = 'rtl';
+          pdfContent.style.fontFamily = 'Rubik, Arial, sans-serif';
+          
+          // Add a title
+          const title = document.createElement('h1');
+          title.textContent = 'מערכת שעות שבועית';
+          title.style.textAlign = 'center';
+          title.style.marginBottom = '20px';
+          pdfContent.appendChild(title);
+          
+          // Add student name
+          const studentName = document.getElementById('student-name').textContent;
+          const nameElement = document.createElement('h2');
+          nameElement.textContent = 'תלמיד: ' + studentName;
+          nameElement.style.textAlign = 'center';
+          nameElement.style.marginBottom = '30px';
+          pdfContent.appendChild(nameElement);
+          
+          // Clone the schedule list (table view) as it's more suitable for PDF
+          const scheduleListClone = scheduleList.cloneNode(true);
+          pdfContent.appendChild(scheduleListClone);
+          
+          // Set options for html2pdf
+          const options = {
+            margin: 10,
+            filename: 'מערכת_שעות_' + new Date().toLocaleDateString('he-IL') + '.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+          };
+          
+          // Generate and download the PDF
+          html2pdf().from(pdfContent).set(options).save();
+        });
+      }
+    });
+    
     // Tab switching functionality
     function openTab(evt, tabName) {
       // Hide all tab contents
@@ -464,7 +607,63 @@
           bar.style.width = bar.parentElement.dataset.value || '0%';
         }, 300);
       });
+      
+      // Apply unique colors to lessons based on course ID
+      applyCoursesColors();
     });
+    
+    // Function to generate a unique color based on course ID
+    function generateCourseColor(courseId) {
+      // Convert courseId to a number if it's not already
+      const id = parseInt(courseId);
+      
+      // Use the course ID to generate a hue value (0-360)
+      // Multiply by a prime number to get better distribution
+      const hue = (id * 83) % 360;
+      
+      // Use a fixed saturation and lightness to ensure readability
+      // Lightness should be high enough for text to be visible (50-80%)
+      const saturation = 70; // 70%
+      const lightness = 65;  // 65%
+      
+      // Return the HSL color
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+    
+    // Function to generate a border color (darker version of the background)
+    function generateBorderColor(courseId) {
+      const id = parseInt(courseId);
+      const hue = (id * 83) % 360;
+      const saturation = 70; // 70%
+      const lightness = 45;  // Darker than the background
+      
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+    
+    // Apply colors to all lesson items
+    function applyCoursesColors() {
+      const lessonItems = document.querySelectorAll('.lesson-item[data-course-id]');
+      
+      lessonItems.forEach(item => {
+        const courseId = item.getAttribute('data-course-id');
+        if (courseId) {
+          const backgroundColor = generateCourseColor(courseId);
+          const borderColor = generateBorderColor(courseId);
+          
+          item.style.backgroundColor = backgroundColor;
+          item.style.borderRight = `3px solid ${borderColor}`;
+          
+          // Ensure text is readable by setting a contrasting text color
+          // For lighter backgrounds, use dark text; for darker backgrounds, use light text
+          const lightness = parseInt(courseId) * 83 % 100;
+          if (lightness > 70) {
+            item.style.color = '#333'; // Dark text for light backgrounds
+          } else {
+            item.style.color = '#fff'; // Light text for dark backgrounds
+          }
+        }
+      });
+    }
   </script>
 </body>
 </html>

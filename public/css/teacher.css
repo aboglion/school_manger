@@ -286,7 +286,7 @@ table tr:hover {
 }
 
 .time-column {
-  min-width: 8%;
+  min-width: 3%;
   border-left: 1px solid var(--border-color);
   background-color: rgba(76, 175, 80, 0.05);
 }
@@ -301,6 +301,17 @@ table tr:hover {
   position: sticky;
   top: 0;
   z-index: 10;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-date {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-top: 3px;
 }
 
 .time-slot {
@@ -313,6 +324,19 @@ table tr:hover {
   font-weight: 500;
 }
 
+.day-lessons {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.time-cell {
+  height: 60px;
+  border-bottom: 1px solid var(--border-color);
+  padding: var(--spacing-xs);
+  position: relative;
+}
+
 .days-container {
   display: flex;
   flex: 1;
@@ -320,7 +344,7 @@ table tr:hover {
 
 .day-column {
   flex: 1;
-  min-width: 15%;
+  min-width: 12.75%;  /* Reduced by 15% from 15% */
   border-left: 1px solid var(--border-color);
 }
 
@@ -351,6 +375,8 @@ table tr:hover {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+  cursor: pointer;
 }
 
 .lesson-item:hover {
@@ -358,6 +384,42 @@ table tr:hover {
   box-shadow: var(--shadow-sm);
   background-color: rgba(76, 175, 80, 0.15);
   z-index: 5;
+}
+
+/* Tooltip styles */
+.lesson-tooltip {
+  visibility: hidden;
+  width: 220px;
+  background-color: var(--background-white);
+  color: var(--text-primary);
+  text-align: center;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  position: absolute;
+  z-index: 100;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -110px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+}
+
+.lesson-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--background-white) transparent transparent transparent;
+}
+
+.lesson-item:hover .lesson-tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 .lesson-title {

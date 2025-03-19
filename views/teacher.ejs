@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>עמוד ניהול למורה</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="/css/teacher.css">
+  <link rel="stylesheet" href="/css/shared-schedule.css">
 </head>
 <body>
   <header>
@@ -93,7 +95,7 @@
       </div>
       <div class="improved-schedule-container">
         <div class="time-column">
-          <div class="time-header">שעות</div>
+          <div class="time-header"><i class="fas fa-clock"></i></div>
           <%
             // Define time slots
             const timeSlots = [
@@ -108,7 +110,7 @@
         
         <div class="days-container">
           <%
-            const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+            const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'];
             const dayMap = {};
             
             // Group lessons by day of week
@@ -124,22 +126,52 @@
           
           <% days.forEach((day, index) => { %>
             <div class="day-column">
-              <div class="day-header"><%= day %></div>
+              <div class="day-header">
+                <div><i class="fas fa-calendar-day"></i> <%= day %></div>
+                <div class="day-date"><%= new Date().toLocaleDateString('he-IL') %></div>
+              </div>
               <div class="day-lessons">
                 <% timeSlots.forEach(timeSlot => { %>
                   <div class="time-cell">
                     <%
                       // Find lessons that fall within this time slot
                       const lessonsInSlot = dayMap[index] ? dayMap[index].filter(lesson => {
-                        const lessonStart = lesson.start_time.substring(0, 5);
-                        const lessonEnd = lesson.end_time.substring(0, 5);
-                        return lessonStart <= timeSlot && lessonEnd > timeSlot;
+                        // Get the hour part of the time slot (e.g., "08" from "08:00")
+                        const timeSlotHour = parseInt(timeSlot.split(':')[0]);
+                        
+                        // Get the hour parts of the lesson start and end times
+                        const lessonStartHour = parseInt(lesson.start_time.split(':')[0]);
+                        const lessonEndHour = parseInt(lesson.end_time.split(':')[0]);
+                        
+                        // Check if the time slot hour is within the lesson hours
+                        return lessonStartHour <= timeSlotHour && lessonEndHour > timeSlotHour;
                       }) : [];
                     %>
                     
                     <% if (lessonsInSlot.length > 0) { %>
                       <% lessonsInSlot.forEach(lesson => { %>
-                        <div class="lesson-item">
+                        <%
+                          // Debug: Log the lesson object to see what properties are available
+                          console.log("Lesson object:", lesson);
+                          
+                          // Get the course ID from the lesson object
+                          const courseId = lesson.ID_COURSE || lesson.COURSE_ID || lesson.id_course;
+                        %>
+                        <%
+                          // Make sure we have a valid course ID
+                          const courseId = lesson.ID_COURSE || lesson.COURSE_ID || lesson.id_course;
+                        %>
+                        <div class="lesson-item"
+                             data-course-id="<%= courseId %>"
+                             onclick="window.location.href='/course/<%= courseId %>'">
+                          <div class="lesson-tooltip">
+                            <strong><%= lesson.Name_Course %></strong>
+                            <p>זמן: <%= lesson.start_time %> - <%= lesson.end_time %></p>
+                            <% if (lesson.infromation) { %>
+                              <p>מידע: <%= lesson.infromation %></p>
+                            <% } %>
+                            <small>לחץ לצפייה בדף הקורס</small>
+                          </div>
                           <div class="lesson-title"><strong><%= lesson.Name_Course %></strong></div>
                           <div class="lesson-time"><%= lesson.start_time %> - <%= lesson.end_time %></div>
                         </div>
@@ -381,7 +413,73 @@
       
       document.getElementById(tabName).classList.add("active");
       evt.currentTarget.classList.add("active");
+      
+      // If switching to schedule tab, apply colors
+      if (tabName === 'schedule') {
+        applyCoursesColors();
+      }
     }
+    
+    // Function to generate a unique color based on course ID
+    function generateCourseColor(courseId) {
+      // Convert courseId to a number if it's not already
+      const id = parseInt(courseId);
+      
+      // Use the course ID to generate a hue value (0-360)
+      // Multiply by a prime number to get better distribution
+      const hue = (id * 83) % 360;
+      
+      // Use a fixed saturation and lightness to ensure readability
+      // Lightness should be high enough for text to be visible (50-80%)
+      const saturation = 70; // 70%
+      const lightness = 65;  // 65%
+      
+      // Return the HSL color
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+    
+    // Function to generate a border color (darker version of the background)
+    function generateBorderColor(courseId) {
+      const id = parseInt(courseId);
+      const hue = (id * 83) % 360;
+      const saturation = 70; // 70%
+      const lightness = 45;  // Darker than the background
+      
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+    
+    // Apply colors to all lesson items
+    function applyCoursesColors() {
+      const lessonItems = document.querySelectorAll('.lesson-item[data-course-id]');
+      
+      lessonItems.forEach(item => {
+        const courseId = item.getAttribute('data-course-id');
+        if (courseId) {
+          const backgroundColor = generateCourseColor(courseId);
+          const borderColor = generateBorderColor(courseId);
+          
+          item.style.backgroundColor = backgroundColor;
+          item.style.borderRight = `3px solid ${borderColor}`;
+          
+          // Ensure text is readable by setting a contrasting text color
+          // For lighter backgrounds, use dark text; for darker backgrounds, use light text
+          const lightness = parseInt(courseId) * 83 % 100;
+          if (lightness > 70) {
+            item.style.color = '#333'; // Dark text for light backgrounds
+          } else {
+            item.style.color = '#fff'; // Light text for dark backgrounds
+          }
+        }
+      });
+    }
+    
+    // Apply colors when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // If schedule tab is active, apply colors
+      if (document.getElementById('schedule').classList.contains('active')) {
+        applyCoursesColors();
+      }
+    });
 
     // Homework modal
     function openHomeworkModal() {

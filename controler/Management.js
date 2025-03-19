@@ -280,6 +280,48 @@ router.get('/course-schedule/:courseId', async (req, res) => {
   }
 });
 
+// Get all courses
+router.get('/all-courses', async (req, res) => {
+  try {
+    const query = "SELECT * FROM COURSE";
+    const courses = await dbFun.get_data(query);
+    res.status(200).json({ courses });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Update student courses
+router.post('/update-student-courses', async (req, res) => {
+  const { studentId, courseIds } = req.body;
+  
+  if (!studentId || !Array.isArray(courseIds)) {
+    return res.status(400).json({ error: "נתונים חסרים או לא תקינים" });
+  }
+  
+  try {
+    // Remove existing registrations
+    const deleteQuery = `DELETE FROM REGISTRATION_FOR_COURSE WHERE ID_STUDENT = ${studentId}`;
+    await dbFun.updateData(deleteQuery);
+    
+    // Add new registrations
+    for (const courseId of courseIds) {
+      const insertQuery = `INSERT INTO REGISTRATION_FOR_COURSE (ID_STUDENT, ID_COURSE) VALUES (${studentId}, ${courseId})`;
+      await dbFun.updateData(insertQuery);
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: "הקורסים עודכנו בהצלחה",
+      courseCount: courseIds.length
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 router.post('/register-student-course', async (req, res) => {
   const { studentId, courseId, lessonIds } = req.body;
   
@@ -412,7 +454,7 @@ async function checkScheduleConflictsForLessons(studentId, newCourseId, selected
   
   for (const course of studentCourses) {
     // Skip if it's the same course (shouldn't happen, but just in case)
-    if (course.ID_COURSE === newCourseId) {
+    if (parseInt(course.ID_COURSE) === parseInt(newCourseId)) {
       continue;
     }
     
@@ -436,8 +478,8 @@ async function checkScheduleConflictsForLessons(studentId, newCourseId, selected
           const existingStart = new Date(`2000-01-01T${existingLesson.start_time}`);
           const existingEnd = new Date(`2000-01-01T${existingLesson.end_time}`);
           
-          // Check for overlap
-          if ((newStart <= existingEnd && existingStart <= newEnd)) {
+          // Check for overlap - ensure there's a real overlap
+          if (newStart < existingEnd && existingStart < newEnd) {
             conflicts.push({
               date: newLesson.LESSON_DATE,
               existingCourse: existingLesson.Name_Course,
@@ -474,8 +516,8 @@ async function checkScheduleConflictsForLessons(studentId, newCourseId, selected
         const teacherStart = new Date(`2000-01-01T${teacherLesson.start_time}`);
         const teacherEnd = new Date(`2000-01-01T${teacherLesson.end_time}`);
         
-        // Check for overlap
-        if ((newStart <= teacherEnd && teacherStart <= newEnd)) {
+        // Check for overlap - ensure there's a real overlap
+        if (newStart < teacherEnd && teacherStart < newEnd) {
           conflicts.push({
             date: newLesson.LESSON_DATE,
             existingCourse: `${teacherLesson.Name_Course} (המורה כבר מלמד)`,

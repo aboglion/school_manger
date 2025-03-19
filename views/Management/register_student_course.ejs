@@ -32,6 +32,18 @@
       text-decoration: none;
       font-weight: bold;
     }
+    
+    .main-button {
+      position: absolute;
+      top: 10px;
+      left: 100px;
+      background-color: white;
+      color: #4CAF50;
+      padding: 5px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+    }
 
     main {
       max-width: 1200px;
@@ -50,11 +62,12 @@
 
     .selection-panel {
       display: flex;
+      justify-content: center;
       gap: 2em;
     }
 
-    .student-selection, .course-selection {
-      flex: 1;
+    .student-selection {
+      width: 50%;
     }
 
     label {
@@ -108,6 +121,116 @@
       color: #4CAF50;
     }
 
+    .courses-container {
+      display: flex;
+      gap: 2em;
+      margin-bottom: 2em;
+    }
+    
+    .floating-courses {
+      position: fixed;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      max-width: 90%;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .floating-courses.collapsed {
+      height: 40px;
+      overflow: hidden;
+      padding: 10px 15px;
+    }
+    
+    .toggle-courses-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(76, 175, 80, 0.8);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      transition: transform 0.3s ease;
+    }
+    
+    .toggle-courses-btn:hover {
+      background-color: rgba(76, 175, 80, 1);
+    }
+    
+    .toggle-courses-btn i {
+      transition: transform 0.3s ease;
+    }
+    
+    .floating-courses.collapsed .toggle-courses-btn i {
+      transform: rotate(180deg);
+    }
+
+    .course-column {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1em;
+      min-height: 200px;
+    }
+
+    .course-column h3 {
+      margin-top: 0;
+      padding-bottom: 0.5em;
+      border-bottom: 1px solid #eee;
+      color: #4CAF50;
+      text-align: center;
+    }
+
+    .course-list {
+      list-style-type: none;
+      padding: 10px;
+      margin: 0;
+      min-height: 150px;
+      overflow-y: auto;
+      max-height: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+    }
+
+    .course-item {
+      padding: 0.75em;
+      margin-bottom: 0.5em;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      border-right: 3px solid #4CAF50;
+      cursor: grab;
+      transition: all 0.2s;
+    }
+
+    .course-item:hover {
+      background-color: #f0f0f0;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .course-item.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+
+    .course-item-registered {
+      border-right-color: #2196F3;
+    }
+
     .schedule-grid {
       display: flex;
       overflow-x: auto;
@@ -130,6 +253,10 @@
       border-bottom: 1px solid #ddd;
       background-color: #4CAF50;
       color: white;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .time-slot {
@@ -167,19 +294,6 @@
       border-bottom: 1px solid #ddd;
       padding: 0.25em;
       position: relative;
-    }
-
-    .time-cell.available {
-      background-color: rgba(76, 175, 80, 0.05);
-      cursor: pointer;
-    }
-
-    .time-cell.available:hover {
-      background-color: rgba(76, 175, 80, 0.1);
-    }
-
-    .time-cell.selected {
-      background-color: rgba(76, 175, 80, 0.2);
     }
 
     .time-cell.conflict {
@@ -266,6 +380,59 @@
     .conflict-item:last-child {
       border-bottom: none;
     }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      animation: fadeIn 0.3s;
+    }
+    
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 80%;
+      max-width: 600px;
+      position: relative;
+      animation: slideIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from {opacity: 0}
+      to {opacity: 1}
+    }
+    
+    @keyframes slideIn {
+      from {transform: translateY(-50px); opacity: 0;}
+      to {transform: translateY(0); opacity: 1;}
+    }
+    
+    .close {
+      color: #aaa;
+      float: left;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      left: 15px;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: #333;
+      text-decoration: none;
+    }
 
     .student-list {
       list-style-type: none;
@@ -310,18 +477,13 @@
       border-radius: 4px;
     }
 
-    .legend-available {
-      background-color: rgba(76, 175, 80, 0.2);
-      border: 1px solid #4CAF50;
-    }
-
     .legend-existing {
       background-color: rgba(33, 150, 243, 0.1);
       border-right: 3px solid #2196F3;
     }
 
-    .legend-selected {
-      background-color: rgba(76, 175, 80, 0.2);
+    .legend-registered {
+      background-color: rgba(76, 175, 80, 0.1);
       border-right: 3px solid #4CAF50;
     }
 
@@ -330,8 +492,34 @@
       border-right: 3px solid #F44336;
     }
 
+    .dropzone {
+      border: 2px dashed #ccc;
+      border-radius: 4px;
+      padding: 1em;
+      text-align: center;
+      color: #999;
+      margin-bottom: 1em;
+      transition: all 0.3s;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .dropzone.active {
+      border-color: #4CAF50;
+      background-color: rgba(76, 175, 80, 0.05);
+    }
+    
+    .course-list {
+      position: relative;
+      min-height: 150px;
+    }
+
     @media (max-width: 768px) {
-      .selection-panel {
+      .courses-container {
         flex-direction: column;
       }
     }
@@ -341,6 +529,7 @@
   <header>
     <h1>רישום תלמיד לקורס</h1>
     <a href="/Management" class="back-button">חזרה</a>
+    <a href="/Management" class="main-button"><i class="fas fa-home"></i> מסך ראשי</a>
   </header>
   <main>
     <div class="registration-container">
@@ -354,15 +543,6 @@
             <% }); %>
           </select>
         </div>
-        <div class="course-selection">
-          <label for="course"><i class="fas fa-book"></i> בחר קורס:</label>
-          <select name="courseId" id="course" required>
-            <option value="">-- בחר קורס --</option>
-            <% courses.forEach(course => { %>
-              <option value="<%= course.ID_COURSE %>"><%= course.Name_Course %></option>
-            <% }); %>
-          </select>
-        </div>
       </div>
 
       <div id="scheduleContainer" class="schedule-container">
@@ -371,18 +551,28 @@
           <span id="studentName" class="student-name"></span>
         </div>
         
-        <div class="legend">
-          <div class="legend-item">
-            <div class="legend-color legend-available"></div>
-            <span>זמן פנוי</span>
+        <div id="floatingCoursesContainer" class="courses-container floating-courses">
+          <button id="toggleCoursesBtn" class="toggle-courses-btn" title="הסתר/הצג חלון קורסים">
+            <i class="fas fa-chevron-up"></i>
+          </button>
+          <div class="course-column">
+            <h3><i class="fas fa-book"></i> קורסים לא רשומים</h3>
+            <ul id="availableCourses" class="course-list"></ul>
           </div>
+          <div class="course-column">
+            <h3><i class="fas fa-check-circle"></i> קורסים רשומים</h3>
+            <ul id="registeredCourses" class="course-list"></ul>
+          </div>
+        </div>
+        
+        <div class="legend">
           <div class="legend-item">
             <div class="legend-color legend-existing"></div>
             <span>שיעור קיים</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color legend-selected"></div>
-            <span>שיעור נבחר</span>
+            <div class="legend-color legend-registered"></div>
+            <span>שיעור רשום</span>
           </div>
           <div class="legend-item">
             <div class="legend-color legend-conflict"></div>
@@ -411,11 +601,8 @@
         </div>
         
         <div class="registration-actions">
-          <button type="button" id="clearSelectionBtn" class="btn-secondary">
-            <i class="fas fa-times"></i> נקה בחירה
-          </button>
-          <button type="button" id="registerBtn" disabled>
-            <i class="fas fa-save"></i> רשום לקורס
+          <button type="button" id="saveBtn">
+            <i class="fas fa-save"></i> שמור שינויים
           </button>
         </div>
       </div>
@@ -430,18 +617,19 @@
   <script>
     // Global variables
     let studentSchedule = [];
-    let courseSchedule = [];
-    let selectedTimeSlots = [];
-    let days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+    let allCourses = [];
+    let registeredCourses = [];
+    let availableCourses = [];
+    let days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'];
     
     // DOM elements
     const studentSelect = document.getElementById('student');
-    const courseSelect = document.getElementById('course');
     const scheduleContainer = document.getElementById('scheduleContainer');
     const daysContainer = document.getElementById('daysContainer');
     const studentNameElement = document.getElementById('studentName');
-    const registerBtn = document.getElementById('registerBtn');
-    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+    const availableCoursesElement = document.getElementById('availableCourses');
+    const registeredCoursesElement = document.getElementById('registeredCourses');
+    const saveBtn = document.getElementById('saveBtn');
     const resultContainer = document.getElementById('resultContainer');
     
     // Time slots
@@ -452,9 +640,177 @@
     
     // Event listeners
     studentSelect.addEventListener('change', handleStudentChange);
-    courseSelect.addEventListener('change', handleCourseChange);
-    clearSelectionBtn.addEventListener('click', clearSelection);
-    registerBtn.addEventListener('click', registerStudentToCourse);
+    saveBtn.addEventListener('click', saveChanges);
+    
+    // Toggle courses container
+    const toggleCoursesBtn = document.getElementById('toggleCoursesBtn');
+    const floatingCoursesContainer = document.getElementById('floatingCoursesContainer');
+    
+    toggleCoursesBtn.addEventListener('click', function() {
+      floatingCoursesContainer.classList.toggle('collapsed');
+    });
+    
+    // Initialize drag and drop
+    function initDragAndDrop() {
+      const courseItems = document.querySelectorAll('.course-item');
+      const dropZones = document.querySelectorAll('.course-list');
+      
+      // Make the course columns drop targets as well
+      const courseColumns = document.querySelectorAll('.course-column');
+      courseColumns.forEach(column => {
+        const listId = column.querySelector('.course-list').id;
+        column.dataset.listId = listId;
+        setupDropListeners(column);
+      });
+      
+      // Add empty dropzone to each list to allow dropping when list is empty
+      dropZones.forEach(zone => {
+        // Create a dropzone element that will be visible when the list is empty
+        const emptyDropzone = document.createElement('div');
+        emptyDropzone.className = 'dropzone';
+        emptyDropzone.textContent = 'גרור קורסים לכאן';
+        emptyDropzone.dataset.parentList = zone.id;
+        
+        // Only show the dropzone if the list is empty
+        if (zone.children.length === 0) {
+          zone.appendChild(emptyDropzone);
+        }
+        
+        // Add dragover, dragleave, and drop event listeners to the empty dropzone
+        setupDropListeners(emptyDropzone);
+      });
+      
+      courseItems.forEach(item => {
+        item.setAttribute('draggable', true);
+        
+        item.addEventListener('dragstart', function(e) {
+          e.dataTransfer.setData('text/plain', item.dataset.courseId);
+          item.classList.add('dragging');
+          setTimeout(() => {
+            item.style.display = 'none';
+          }, 0);
+        });
+        
+        item.addEventListener('dragend', function() {
+          item.classList.remove('dragging');
+          item.style.display = 'block';
+        });
+      });
+      
+      // Setup drop listeners for the course lists
+      dropZones.forEach(zone => {
+        setupDropListeners(zone);
+      });
+    }
+    
+    // Function to set up drop listeners for both course lists and empty dropzones
+    function setupDropListeners(element) {
+      element.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        element.classList.add('active');
+      });
+      
+      element.addEventListener('dragleave', function() {
+        element.classList.remove('active');
+      });
+      
+      element.addEventListener('drop', function(e) {
+        e.preventDefault();
+        element.classList.remove('active');
+        
+        const courseId = e.dataTransfer.getData('text/plain');
+        if (!courseId) return; // No valid course ID found
+        
+        const courseItem = document.querySelector(`.course-item[data-course-id="${courseId}"]`);
+        if (!courseItem) return; // Course item not found
+        
+        // Determine which list this element belongs to
+        let targetList;
+        
+        if (element.classList.contains('dropzone')) {
+          // If dropped on an empty dropzone, use its parent list ID
+          targetList = element.dataset.parentList;
+        } else if (element.classList.contains('course-list')) {
+          // If dropped directly on a list
+          targetList = element.id;
+        } else if (element.classList.contains('course-column')) {
+          // If dropped on a course column
+          targetList = element.dataset.listId;
+        } else if (element.closest('.course-column')) {
+          // If dropped on an element inside a course column
+          targetList = element.closest('.course-column').dataset.listId;
+        } else {
+          // Fallback - try to find the closest list
+          const closestList = element.closest('.course-list');
+          if (closestList) {
+            targetList = closestList.id;
+          } else {
+            return; // No valid target found
+          }
+        }
+        
+        // Get the actual list element
+        const listElement = document.getElementById(targetList);
+        if (!listElement) return; // List element not found
+        
+        // Remove any empty dropzone if it exists
+        const emptyDropzone = listElement.querySelector('.dropzone');
+        if (emptyDropzone) {
+          listElement.removeChild(emptyDropzone);
+        }
+        
+        if (targetList === 'registeredCourses') {
+          // Move to registered courses
+          if (courseItem.parentElement.id !== 'registeredCourses') {
+            registeredCoursesElement.appendChild(courseItem);
+            courseItem.classList.add('course-item-registered');
+            
+            // Update data structures
+            const courseIndex = availableCourses.findIndex(c => c.ID_COURSE.toString() === courseId);
+            if (courseIndex !== -1) {
+              const course = availableCourses.splice(courseIndex, 1)[0];
+              registeredCourses.push(course);
+            }
+            
+            // Add empty dropzone to available courses if it's now empty
+            if (availableCoursesElement.children.length === 0) {
+              const newEmptyDropzone = document.createElement('div');
+              newEmptyDropzone.className = 'dropzone';
+              newEmptyDropzone.textContent = 'גרור קורסים לכאן';
+              newEmptyDropzone.dataset.parentList = 'availableCourses';
+              setupDropListeners(newEmptyDropzone);
+              availableCoursesElement.appendChild(newEmptyDropzone);
+            }
+          }
+        } else if (targetList === 'availableCourses') {
+          // Move to available courses
+          if (courseItem.parentElement.id !== 'availableCourses') {
+            availableCoursesElement.appendChild(courseItem);
+            courseItem.classList.remove('course-item-registered');
+            
+            // Update data structures
+            const courseIndex = registeredCourses.findIndex(c => c.ID_COURSE.toString() === courseId);
+            if (courseIndex !== -1) {
+              const course = registeredCourses.splice(courseIndex, 1)[0];
+              availableCourses.push(course);
+            }
+            
+            // Add empty dropzone to registered courses if it's now empty
+            if (registeredCoursesElement.children.length === 0) {
+              const newEmptyDropzone = document.createElement('div');
+              newEmptyDropzone.className = 'dropzone';
+              newEmptyDropzone.textContent = 'גרור קורסים לכאן';
+              newEmptyDropzone.dataset.parentList = 'registeredCourses';
+              setupDropListeners(newEmptyDropzone);
+              registeredCoursesElement.appendChild(newEmptyDropzone);
+            }
+          }
+        }
+        
+        // Update schedule display
+        updateScheduleDisplay();
+      });
+    }
     
     // Functions
     async function handleStudentChange() {
@@ -475,50 +831,105 @@
           const data = await response.json();
           studentSchedule = data.schedule;
           
-          // Show schedule container
-          scheduleContainer.style.display = 'block';
-          
-          // Update schedule display
-          updateScheduleDisplay();
+          // Fetch all courses
+          const coursesResponse = await fetch('/Management/all-courses');
+          if (coursesResponse.ok) {
+            const coursesData = await coursesResponse.json();
+            allCourses = coursesData.courses;
+            
+            // Determine registered and available courses
+            registeredCourses = allCourses.filter(course => 
+              studentSchedule.some(lesson => lesson.ID_COURSE === course.ID_COURSE)
+            );
+            
+            availableCourses = allCourses.filter(course => 
+              !registeredCourses.some(rc => rc.ID_COURSE === course.ID_COURSE)
+            );
+            
+            // Populate course lists
+            populateCourseLists();
+            
+            // Show schedule container
+            scheduleContainer.style.display = 'block';
+            
+            // Update schedule display
+            updateScheduleDisplay();
+            
+            // Initialize drag and drop
+            initDragAndDrop();
+          } else {
+            alert('שגיאה בטעינת רשימת הקורסים');
+          }
         } else {
           alert('שגיאה בטעינת מערכת השעות של התלמיד');
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('שגיאה בטעינת מערכת השעות של התלמיד');
+        alert('שגיאה בטעינת נתוני התלמיד');
       }
     }
     
-    async function handleCourseChange() {
-      const courseId = courseSelect.value;
-      if (!courseId) {
-        // Clear course schedule
-        courseSchedule = [];
-        updateScheduleDisplay();
-        return;
+    function populateCourseLists() {
+      // Clear lists
+      availableCoursesElement.innerHTML = '';
+      registeredCoursesElement.innerHTML = '';
+      
+      // Populate available courses
+      if (availableCourses.length === 0) {
+        const emptyDropzone = document.createElement('div');
+        emptyDropzone.className = 'dropzone';
+        emptyDropzone.textContent = 'גרור קורסים לכאן';
+        emptyDropzone.dataset.parentList = 'availableCourses';
+        setupDropListeners(emptyDropzone);
+        availableCoursesElement.appendChild(emptyDropzone);
+      } else {
+        availableCourses.forEach(course => {
+          const courseItem = document.createElement('li');
+          courseItem.className = 'course-item';
+          courseItem.dataset.courseId = course.ID_COURSE;
+          courseItem.innerHTML = `<i class="fas fa-book"></i> ${course.Name_Course}`;
+          availableCoursesElement.appendChild(courseItem);
+        });
       }
       
-      try {
-        // Fetch course schedule
-        const response = await fetch(`/Management/course-schedule/${courseId}`);
-        if (response.ok) {
-          const data = await response.json();
-          courseSchedule = data.schedule;
-          
-          // Update schedule display
-          updateScheduleDisplay();
-        } else {
-          alert('שגיאה בטעינת מערכת השעות של הקורס');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('שגיאה בטעינת מערכת השעות של הקורס');
+      // Populate registered courses
+      if (registeredCourses.length === 0) {
+        const emptyDropzone = document.createElement('div');
+        emptyDropzone.className = 'dropzone';
+        emptyDropzone.textContent = 'גרור קורסים לכאן';
+        emptyDropzone.dataset.parentList = 'registeredCourses';
+        setupDropListeners(emptyDropzone);
+        registeredCoursesElement.appendChild(emptyDropzone);
+      } else {
+        registeredCourses.forEach(course => {
+          const courseItem = document.createElement('li');
+          courseItem.className = 'course-item course-item-registered';
+          courseItem.dataset.courseId = course.ID_COURSE;
+          courseItem.innerHTML = `<i class="fas fa-book"></i> ${course.Name_Course}`;
+          registeredCoursesElement.appendChild(courseItem);
+        });
       }
     }
     
-    function updateScheduleDisplay() {
+    async function updateScheduleDisplay() {
       // Clear days container
       daysContainer.innerHTML = '';
+      
+      // Ensure all registered courses have their schedules
+      await Promise.all(registeredCourses.map(async (course) => {
+        if (!course.schedule) {
+          try {
+            const response = await fetch(`/Management/course-schedule/${course.ID_COURSE}`);
+            if (response.ok) {
+              const data = await response.json();
+              course.schedule = data.schedule;
+            }
+          } catch (error) {
+            console.error('Error fetching course schedule:', error);
+            course.schedule = [];
+          }
+        }
+      }));
       
       // Create day columns
       days.forEach((day, dayIndex) => {
@@ -540,82 +951,63 @@
           timeCell.dataset.day = dayIndex;
           timeCell.dataset.time = timeSlot;
           
-          // Check if this time slot has an existing lesson for the student
-          const existingLesson = studentSchedule.find(lesson => {
-            const lessonDate = new Date(lesson.LESSON_DATE);
-            return lessonDate.getDay() === dayIndex &&
-                  lesson.start_time <= timeSlot &&
-                  lesson.end_time > timeSlot;
-          });
+          // Get all lessons for this time slot
+          const lessonsAtThisTime = [];
           
-          // Check if this time slot is available for the course
-          const courseLesson = courseSchedule.find(lesson => {
-            const lessonDate = new Date(lesson.LESSON_DATE);
-            return lessonDate.getDay() === dayIndex &&
-                  lesson.start_time <= timeSlot &&
-                  lesson.end_time > timeSlot;
-          });
+          // Check registered courses
+          for (const course of registeredCourses) {
+            // Check if this course has a lesson at this time slot
+            if (course.schedule) {
+              const lesson = course.schedule.find(l => {
+                const lessonDate = new Date(l.LESSON_DATE);
+                return lessonDate.getDay() === dayIndex &&
+                      l.start_time <= timeSlot &&
+                      l.end_time > timeSlot;
+              });
+              
+              if (lesson) {
+                lessonsAtThisTime.push({
+                  course,
+                  lesson,
+                  type: 'registered'
+                });
+              }
+            }
+          }
           
-          // Check if this time slot is selected
-          const isSelected = selectedTimeSlots.some(slot =>
-            slot.day === dayIndex && slot.time === timeSlot
-          );
+          // Check for conflicts
+          const hasConflict = lessonsAtThisTime.length > 1;
           
-          if (existingLesson) {
-            // Student already has a lesson at this time
+          if (lessonsAtThisTime.length > 0) {
+            // Display the first lesson (or the conflicting lessons)
+            const lessonInfo = lessonsAtThisTime[0];
+            
             const lessonItem = document.createElement('div');
-            lessonItem.className = 'lesson-item existing';
+            lessonItem.className = `lesson-item ${hasConflict ? 'conflict' : (lessonInfo.type === 'registered' ? 'existing' : '')}`;
             
             const lessonTitle = document.createElement('div');
             lessonTitle.className = 'lesson-title';
-            lessonTitle.innerHTML = `<i class="fas fa-book"></i> ${existingLesson.Name_Course}`;
+            lessonTitle.innerHTML = `<i class="fas fa-book"></i> ${lessonInfo.course.Name_Course}`;
             lessonItem.appendChild(lessonTitle);
             
             const lessonTime = document.createElement('div');
             lessonTime.className = 'lesson-time';
-            lessonTime.innerHTML = `<i class="far fa-clock"></i> ${existingLesson.start_time} - ${existingLesson.end_time}`;
+            lessonTime.innerHTML = `<i class="far fa-clock"></i> ${lessonInfo.lesson.start_time} - ${lessonInfo.lesson.end_time}`;
             lessonItem.appendChild(lessonTime);
             
             timeCell.appendChild(lessonItem);
-            timeCell.classList.add('conflict');
-          } else if (isSelected) {
-            // This time slot is selected for the new course
-            const courseOption = courseSelect.options[courseSelect.selectedIndex];
-            const courseName = courseOption.textContent;
             
-            const lessonItem = document.createElement('div');
-            lessonItem.className = 'lesson-item';
-            
-            const lessonTitle = document.createElement('div');
-            lessonTitle.className = 'lesson-title';
-            lessonTitle.innerHTML = `<i class="fas fa-book"></i> ${courseName}`;
-            lessonItem.appendChild(lessonTitle);
-            
-            timeCell.appendChild(lessonItem);
-            timeCell.classList.add('selected');
-            
-            // Add click handler to deselect
-            timeCell.addEventListener('click', () => {
-              selectedTimeSlots = selectedTimeSlots.filter(slot =>
-                !(slot.day === dayIndex && slot.time === timeSlot)
-              );
-              updateScheduleDisplay();
-              updateRegisterButton();
-            });
-          } else if (courseLesson) {
-            // This time slot is available for the course
-            timeCell.classList.add('available');
-            
-            // Add click handler to select
-            timeCell.addEventListener('click', () => {
-              selectedTimeSlots.push({
-                day: dayIndex,
-                time: timeSlot,
-                lessonId: courseLesson.ID_LESSON
+            if (hasConflict) {
+              timeCell.classList.add('conflict');
+              
+              // Add tooltip with conflict information
+              let conflictTooltip = 'חפיפה בין קורסים: ';
+              lessonsAtThisTime.forEach((l, i) => {
+                if (i > 0) conflictTooltip += ', ';
+                conflictTooltip += l.course.Name_Course;
               });
-              updateScheduleDisplay();
-              updateRegisterButton();
-            });
+              timeCell.title = conflictTooltip;
+            }
           }
           
           dayLessons.appendChild(timeCell);
@@ -624,133 +1016,257 @@
         dayColumn.appendChild(dayLessons);
         daysContainer.appendChild(dayColumn);
       });
-      
-      updateRegisterButton();
     }
     
-    function updateRegisterButton() {
-      // Enable register button if student, course, and at least one time slot are selected
-      registerBtn.disabled = !studentSelect.value || !courseSelect.value || selectedTimeSlots.length === 0;
-    }
-    
-    function clearSelection() {
-      selectedTimeSlots = [];
-      updateScheduleDisplay();
-    }
-    
-    async function registerStudentToCourse() {
+    async function saveChanges() {
       const studentId = studentSelect.value;
-      const courseId = courseSelect.value;
       
-      if (!studentId || !courseId || selectedTimeSlots.length === 0) {
-        alert('יש לבחור תלמיד, קורס, ולפחות שיעור אחד');
+      if (!studentId) {
+        alert('יש לבחור תלמיד');
+        return;
+      }
+      
+      // Check for conflicts
+      const conflicts = await checkForConflicts();
+      
+      if (conflicts.length > 0) {
+        // Create a modal popup for conflicts instead of using the result container
+        showConflictModal(conflicts);
         return;
       }
       
       try {
-        const response = await fetch('/Management/register-student-course', {
+        // Get current registrations
+        const currentRegistrations = registeredCourses.map(course => course.ID_COURSE);
+        
+        // Send update request
+        const response = await fetch('/Management/update-student-courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             studentId,
-            courseId,
-            lessonIds: selectedTimeSlots.map(slot => slot.lessonId)
+            courseIds: currentRegistrations
           })
         });
         
         if (response.ok) {
           const data = await response.json();
-          displayResults(data);
+          showSuccessModal(data);
           
-          // Reset selections
-          selectedTimeSlots = [];
-          updateScheduleDisplay();
+          // Add a slight delay before redirecting to ensure the success message is seen
+          setTimeout(() => {
+            window.location.href = '/Management/register-student-course';
+          }, 1500);
         } else {
           const errorData = await response.json();
-          alert(`הייתה בעיה ברישום התלמיד: ${errorData.error}`);
+          alert(`הייתה בעיה בעדכון הקורסים: ${errorData.error}`);
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('הייתה בעיה ברישום התלמיד.');
+        alert('הייתה בעיה בעדכון הקורסים.');
       }
     }
     
-    function displayResults(data) {
-      const successResults = document.getElementById('successResults');
-      const errorResults = document.getElementById('errorResults');
+    async function checkForConflicts() {
+      const conflicts = [];
       
-      // Clear previous results
-      successResults.innerHTML = '';
-      errorResults.innerHTML = '';
-      
-      // Process results
-      if (data.success) {
-        const successDiv = document.createElement('div');
-        successDiv.className = 'result-success';
-        
-        const successTitle = document.createElement('h3');
-        successTitle.innerHTML = `<i class="fas fa-check-circle"></i> התלמיד נרשם בהצלחה לקורס`;
-        successDiv.appendChild(successTitle);
-        
-        const studentOption = studentSelect.options[studentSelect.selectedIndex];
-        const courseOption = courseSelect.options[courseSelect.selectedIndex];
-        
-        const detailsP = document.createElement('p');
-        detailsP.innerHTML = `<strong>תלמיד:</strong> ${studentOption.textContent}<br>
-                             <strong>קורס:</strong> ${courseOption.textContent}<br>
-                             <strong>מספר שיעורים:</strong> ${data.lessonCount}`;
-        successDiv.appendChild(detailsP);
-        
-        successResults.appendChild(successDiv);
-      } else if (data.conflicts && data.conflicts.length > 0) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'result-error';
-        
-        const errorTitle = document.createElement('h3');
-        errorTitle.innerHTML = `<i class="fas fa-exclamation-triangle"></i> לא ניתן לרשום את התלמיד עקב חפיפות במערכת`;
-        errorDiv.appendChild(errorTitle);
-        
-        const studentOption = studentSelect.options[studentSelect.selectedIndex];
-        
-        const studentName = document.createElement('div');
-        studentName.className = 'student-name';
-        studentName.textContent = studentOption.textContent;
-        errorDiv.appendChild(studentName);
-        
-        const conflictTitle = document.createElement('p');
-        conflictTitle.textContent = 'חפיפות שנמצאו:';
-        errorDiv.appendChild(conflictTitle);
-        
-        data.conflicts.forEach(conflict => {
-          const conflictItem = document.createElement('div');
-          conflictItem.className = 'conflict-item';
-          
-          const conflictDate = document.createElement('p');
-          conflictDate.textContent = `תאריך: ${new Date(conflict.date).toLocaleDateString('he-IL')}`;
-          conflictItem.appendChild(conflictDate);
-          
-          const existingCourse = document.createElement('p');
-          existingCourse.textContent = `קורס קיים: ${conflict.existingCourse} (${conflict.existingTime})`;
-          conflictItem.appendChild(existingCourse);
-          
-          const newTime = document.createElement('p');
-          newTime.textContent = `זמן חדש: ${conflict.newTime}`;
-          conflictItem.appendChild(newTime);
-          
-          errorDiv.appendChild(conflictItem);
-        });
-        
-        errorResults.appendChild(errorDiv);
+      // Ensure all registered courses have their schedules
+      for (const course of registeredCourses) {
+        if (!course.schedule) {
+          try {
+            const response = await fetch(`/Management/course-schedule/${course.ID_COURSE}`);
+            if (response.ok) {
+              const data = await response.json();
+              course.schedule = data.schedule;
+            }
+          } catch (error) {
+            console.error('Error fetching course schedule:', error);
+            course.schedule = [];
+          }
+        }
       }
       
-      // Show results container
-      resultContainer.style.display = 'block';
+      // Check for time conflicts between registered courses
+      for (let i = 0; i < registeredCourses.length; i++) {
+        const course1 = registeredCourses[i];
+        
+        for (let j = i + 1; j < registeredCourses.length; j++) {
+          const course2 = registeredCourses[j];
+          
+          // Check for overlaps in schedules
+          for (const lesson1 of course1.schedule || []) {
+            for (const lesson2 of course2.schedule || []) {
+              // Check if lessons are on the same day
+              const date1 = new Date(lesson1.LESSON_DATE);
+              const date2 = new Date(lesson2.LESSON_DATE);
+              
+              if (date1.getDay() === date2.getDay()) {
+                // Parse times to compare
+                const start1 = new Date(`2000-01-01T${lesson1.start_time}`);
+                const end1 = new Date(`2000-01-01T${lesson1.end_time}`);
+                const start2 = new Date(`2000-01-01T${lesson2.start_time}`);
+                const end2 = new Date(`2000-01-01T${lesson2.end_time}`);
+                
+                // Check for overlap - ensure there's a real overlap
+                if (start1 < end2 && start2 < end1) {
+                  conflicts.push({
+                    date: lesson1.LESSON_DATE,
+                    day: days[date1.getDay()],
+                    course1: course1.Name_Course,
+                    time1: `${lesson1.start_time} - ${lesson1.end_time}`,
+                    course2: course2.Name_Course,
+                    time2: `${lesson2.start_time} - ${lesson2.end_time}`
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      return conflicts;
     }
     
-    // Initialize empty schedule display
-    updateScheduleDisplay();
+    // Create modal for conflicts
+    function showConflictModal(conflicts) {
+      // Create modal container if it doesn't exist
+      let modalContainer = document.getElementById('conflictModal');
+      if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'conflictModal';
+        modalContainer.className = 'modal';
+        document.body.appendChild(modalContainer);
+      }
+      
+      // Clear previous content
+      modalContainer.innerHTML = '';
+      
+      // Create modal content
+      const modalContent = document.createElement('div');
+      modalContent.className = 'modal-content';
+      
+      // Add close button
+      const closeBtn = document.createElement('span');
+      closeBtn.className = 'close';
+      closeBtn.innerHTML = '&times;';
+      closeBtn.onclick = function() {
+        modalContainer.style.display = 'none';
+      };
+      modalContent.appendChild(closeBtn);
+      
+      // Add title
+      const title = document.createElement('h3');
+      title.innerHTML = '<i class="fas fa-exclamation-triangle"></i> לא ניתן לשמור את השינויים עקב חפיפות במערכת';
+      modalContent.appendChild(title);
+      
+      // Add conflicts
+      const conflictTitle = document.createElement('p');
+      conflictTitle.textContent = 'חפיפות שנמצאו:';
+      modalContent.appendChild(conflictTitle);
+      
+      conflicts.forEach(conflict => {
+        const conflictItem = document.createElement('div');
+        conflictItem.className = 'conflict-item';
+        
+        const conflictDay = document.createElement('p');
+        conflictDay.textContent = `יום: ${conflict.day}`;
+        conflictItem.appendChild(conflictDay);
+        
+        const course1 = document.createElement('p');
+        course1.textContent = `קורס: ${conflict.course1} (${conflict.time1})`;
+        conflictItem.appendChild(course1);
+        
+        const course2 = document.createElement('p');
+        course2.textContent = `חופף עם: ${conflict.course2} (${conflict.time2})`;
+        conflictItem.appendChild(course2);
+        
+        modalContent.appendChild(conflictItem);
+      });
+      
+      // Add button to close modal
+      const closeButton = document.createElement('button');
+      closeButton.className = 'btn';
+      closeButton.textContent = 'סגור';
+      closeButton.onclick = function() {
+        modalContainer.style.display = 'none';
+      };
+      modalContent.appendChild(closeButton);
+      
+      // Add modal content to container
+      modalContainer.appendChild(modalContent);
+      
+      // Show modal
+      modalContainer.style.display = 'block';
+      
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+        if (event.target == modalContainer) {
+          modalContainer.style.display = 'none';
+        }
+      };
+    }
+    
+    // Create modal for success
+    function showSuccessModal(data) {
+      // Create modal container if it doesn't exist
+      let modalContainer = document.getElementById('successModal');
+      if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'successModal';
+        modalContainer.className = 'modal';
+        document.body.appendChild(modalContainer);
+      }
+      
+      // Clear previous content
+      modalContainer.innerHTML = '';
+      
+      // Create modal content
+      const modalContent = document.createElement('div');
+      modalContent.className = 'modal-content';
+      
+      // Add close button
+      const closeBtn = document.createElement('span');
+      closeBtn.className = 'close';
+      closeBtn.innerHTML = '&times;';
+      closeBtn.onclick = function() {
+        modalContainer.style.display = 'none';
+      };
+      modalContent.appendChild(closeBtn);
+      
+      // Add title
+      const title = document.createElement('h3');
+      title.innerHTML = '<i class="fas fa-check-circle"></i> הקורסים עודכנו בהצלחה';
+      modalContent.appendChild(title);
+      
+      // Add details
+      const studentOption = studentSelect.options[studentSelect.selectedIndex];
+      const detailsP = document.createElement('p');
+      detailsP.innerHTML = `<strong>תלמיד:</strong> ${studentOption.textContent}<br>
+                           <strong>מספר קורסים:</strong> ${registeredCourses.length}`;
+      modalContent.appendChild(detailsP);
+      
+      // Show modal
+      modalContainer.appendChild(modalContent);
+      modalContainer.style.display = 'block';
+      
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+        if (event.target == modalContainer) {
+          modalContainer.style.display = 'none';
+        }
+      };
+    }
+    
+    // Keep these functions for backward compatibility
+    function displayConflictErrors(conflicts) {
+      showConflictModal(conflicts);
+    }
+    
+    function displaySuccessResults(data) {
+      showSuccessModal(data);
+    }
   </script>
 </body>
 </html>

@@ -406,7 +406,7 @@
             <div class="lesson-item">
               <div class="lesson-date">
                 <%= new Date(lesson.LESSON_DATE).toLocaleDateString('he-IL') %>
-                (<%= ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'][new Date(lesson.LESSON_DATE).getDay()] %>)
+                (<%= ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'][new Date(lesson.LESSON_DATE).getDay()] %>)
               </div>
               <div class="lesson-time">
                 <%= lesson.start_time %> - <%= lesson.end_time %>
