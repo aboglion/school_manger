@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ספר פרויקט - מערכת ניהול בית ספר</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+        h1 {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            margin-bottom: 30px;
+        }
+        h2 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: right;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+        }
+        code {
+            background-color: #f8f8f8;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .highlight {
+            background-color: #ffffcc;
+            padding: 10px;
+            border-left: 4px solid #ffcc00;
+            margin: 20px 0;
+        }
+        .page-break {
+            page-break-after: always;
+            height: 0;
+            display: block;
+        }
+        .toc {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-right: 20px;
+        }
+        .toc li {
+            margin-bottom: 10px;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .signature {
+            margin-top: 50px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            text-align: center;
+        }
+        .diagram {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .diagram img {
+            max-width: 80%;
+        }
+        .code-explanation {
+            display: flex;
+            margin: 20px 0;
+        }
+        .code-block {
+            flex: 1;
+            margin-right: 20px;
+        }
+        .explanation {
+            flex: 1;
+        }
+        @media print {
+            body {
+                background-color: #fff;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+        .note {
+            background-color: #e1f5fe;
+            border-right: 4px solid #03a9f4;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .warning {
+            background-color: #fff3e0;
+            border-right: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .diagram-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .diagram-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .diagram-svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .feature-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #f8f8f8;
+        }
+        .feature-card h4 {
+            margin-top: 0;
+            color: #3498db;
+        }
+        .feature-card p {
+            margin-bottom: 0;
+        }
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .tech-badge {
+            background-color: #e1f5fe;
+            color: #0288d1;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .screenshot {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .screenshot img {
+            width: 100%;
+            border: none;
+            margin: 0;
+        }
+        .screenshot-caption {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        .code-sample {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .code-sample-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .implementation-steps {
+            counter-reset: step;
+            margin: 20px 0;
+        }
+        .implementation-step {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .implementation-step:last-child {
+            border-bottom: none;
+        }
+        .implementation-step h4 {
+            counter-increment: step;
+        }
+        .implementation-step h4::before {
+            content: counter(step) ". ";
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>מערכת ניהול בית ספר</h1>
+        <h2>פרויקט גמר - הנדסאי תוכנה</h2>
+        
+        <div class="toc">
+            <h2>תוכן עניינים</h2>
+            <ul>
+                <li><a href="#introduction">1. מבוא</a></li>
+                <li><a href="#project-overview">2. סקירת הפרויקט</a></li>
+                <li><a href="#system-requirements">3. דרישות המערכת</a></li>
+                <li><a href="#system-architecture">4. ארכיטקטורת המערכת</a></li>
+                <li><a href="#database-design">5. תכנון מסד הנתונים</a></li>
+                <li><a href="#ui-design">6. תכנון ממשק המשתמש</a></li>
+                <li><a href="#implementation">7. פרטי מימוש</a></li>
+                <li><a href="#code-examples">8. דוגמאות קוד</a></li>
+                <li><a href="#testing">9. בדיקות</a></li>
+                <li><a href="#deployment">10. פריסה והטמעה</a></li>
+                <li><a href="#user-manual">11. מדריך למשתמש</a></li>
+                <li><a href="#future-work">12. עבודה עתידית</a></li>
+                <li><a href="#conclusion">13. סיכום</a></li>
+                <li><a href="#references">14. מקורות</a></li>
+                <li><a href="#appendices">15. נספחים</a></li>
+            </ul>
+        </div>
+
+        <div class="page-break"></div>
+
+        <section id="introduction">
+            <h2>1. מבוא</h2>
+            <p>
+                מערכת ניהול בית ספר היא פרויקט גמר המיועד לספק פתרון מקיף לניהול מוסד חינוכי. המערכת מאפשרת ניהול יעיל של תלמידים, מורים, קורסים, כיתות, נוכחות ועוד. הפרויקט פותח כחלק מדרישות הגמר לתואר הנדסאי תוכנה, ומדגים יישום של עקרונות הנדסת תוכנה, תכנון מערכות מידע, ופיתוח אפליקציות ווב.
+            </p>
+            <p>
+                בעולם החינוך המודרני, ניהול יעיל של מידע הוא מרכיב קריטי בהצלחת מוסדות חינוך. מערכות ניהול בית ספר מסורתיות מבוססות נייר או מערכות מחשוב מיושנות אינן מספקות את הגמישות, היעילות והנגישות הנדרשות בעידן הדיגיטלי. פרויקט זה נועד לתת מענה לצורך זה על ידי פיתוח מערכת מודרנית, נגישה ויעילה לניהול כל היבטי בית הספר.
+            </p>
+            
+            <div class="note">
+                <h4>הצורך במערכת ניהול בית ספר דיגיטלית</h4>
+                <p>
+                    מחקרים מראים כי מוסדות חינוך המשתמשים במערכות ניהול דיגיטליות מדווחים על שיפור של עד 40% ביעילות התהליכים המנהליים, חיסכון של כ-25 שעות עבודה שבועיות לצוות המנהלי, ושיפור של 30% בתקשורת בין הצוות החינוכי, התלמידים וההורים.
+                </p>
+            </div>
+            
+            <p>
+                המערכת מיועדת לשימוש על ידי שלושה סוגי משתמשים עיקריים: תלמידים, מורים ומנהלי מערכת. כל סוג משתמש נהנה מממשק ייעודי המותאם לצרכיו הספציפיים, עם הרשאות גישה מתאימות. המערכת מאפשרת ניהול מידע בזמן אמת, מעקב אחר נוכחות, ניהול קורסים, תקשורת בין משתמשים, ועוד פונקציות רבות שיפורטו בהמשך המסמך.
+            </p>
+            
+            <div class="tech-stack">
+                <div class="tech-badge">Node.js</div>
+                <div class="tech-badge">Express</div>
+                <div class="tech-badge">EJS</div>
+                <div class="tech-badge">SQLite</div>
+                <div class="tech-badge">JavaScript</div>
+                <div class="tech-badge">HTML5</div>
+                <div class="tech-badge">CSS3</div>
+                <div class="tech-badge">bcrypt</div>
+                <div class="tech-badge">Nodemailer</div>
+                <div class="tech-badge">Moment.js</div>
+                <div class="tech-badge">Font Awesome</div>
+                <div class="tech-badge">HTML2PDF</div>
+            </div>
+            
+            <p>
+                פרויקט זה מדגים שימוש בטכנולוגיות מודרניות לפיתוח ווב, כולל Node.js, Express, EJS, SQLite, ועוד. הפרויקט מיישם ארכיטקטורת MVC (Model-View-Controller) המאפשרת הפרדה ברורה בין שכבות הלוגיקה, הנתונים והתצוגה, ובכך מקלה על תחזוקה, הרחבה ושדרוג המערכת בעתיד.
+            </p>
+            
+            <div class="diagram-container">
+                <div class="diagram-title">תרשים זרימת עבודה בסיסי במערכת</div>
+                <svg class="diagram-svg" width="800" height="300" viewBox="0 0 800 300">
+                    <!-- Flow chart for basic workflow -->
+                    <rect x="50" y="50" width="150" height="60" rx="10" fill="#3498db" />
+                    <text x="125" y="85" text-anchor="middle" fill="white" font-weight="bold">כניסה למערכת</text>
+                    
+                    <rect x="325" y="50" width="150" height="60" rx="10" fill="#2ecc71" />
+                    <text x="400" y="85" text-anchor="middle" fill="white" font-weight="bold">זיהוי סוג משתמש</text>
+                    
+                    <rect x="600" y="50" width="150" height="60" rx="10" fill="#9b59b6" />
+                    <text x="675" y="85" text-anchor="middle" fill="white" font-weight="bold">הצגת ממשק מתאים</text>
+                    
+                    <rect x="50" y="200" width="150" height="60" rx="10" fill="#e74c3c" />
+                    <text x="125" y="235" text-anchor="middle" fill="white" font-weight="bold">ממשק תלמיד</text>
+                    
+                    <rect x="325" y="200" width="150" height="60" rx="10" fill="#e74c3c" />
+                    <text x="400" y="235" text-anchor="middle" fill="white" font-weight="bold">ממשק מורה</text>
+                    
+                    <rect x="600" y="200" width="150" height="60" rx="10" fill="#e74c3c" />
+                    <text x="675" y="235" text-anchor="middle" fill="white" font-weight="bold">ממשק מנהל</text>
+                    
+                    <!-- Connecting arrows -->
+                    <line x1="200" y1="80" x2="325" y2="80" stroke="#333" stroke-width="2" />
+                    <polygon points="320,80 330,83 325,70" fill="#333" />
+                    
+                    <line x1="475" y1="80" x2="600" y2="80" stroke="#333" stroke-width="2" />
+                    <polygon points="595,80 605,83 600,70" fill="#333" />
+                    
+                    <line x1="675" y1="110" x2="675" y2="150" stroke="#333" stroke-width="2" />
+                    <polygon points="675,145 678,155 665,150" fill="#333" />
+                    
+                    <line x1="675" y1="150" x2="125" y2="150" stroke="#333" stroke-width="2" />
+                    <line x1="125" y1="150" x2="125" y2="200" stroke="#333" stroke-width="2" />
+                    <polygon points="125,195 128,205 115,200" fill="#333" />
+                    
+                    <line x1="675" y1="150" x2="400" y2="150" stroke="#333" stroke-width="2" />
+                    <line x1="400" y1="150" x2="400" y2="200" stroke="#333" stroke-width="2" />
+                    <polygon points="400,195 403,205 390,200" fill="#333" />
+                    
+                    <line x1="675" y1="150" x2="675" y2="200" stroke="#333" stroke-width="2" />
+                    <polygon points="675,195 678,205 665,200" fill="#333" />
+                    
+                    <!-- Labels -->
+                    <text x="262" y="65" text-anchor="middle" font-size="12">שליחת פרטי התחברות</text>
+                    <text x="537" y="65" text-anchor="middle" font-size="12">בדיקת הרשאות</text>
+                    <text x="125" y="175" text-anchor="middle" font-size="12">תלמיד</text>
+                    <text x="400" y="175" text-anchor="middle" font-size="12">מורה</text>
+                    <text x="675" y="175" text-anchor="middle" font-size="12">מנהל</text>
+                </svg>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <section id="project-overview">
+            <h2>2. סקירת הפרויקט</h2>
+            <p>
+                מערכת ניהול בית הספר היא פלטפורמה מקיפה המיועדת לייעל את ניהול המידע והתהליכים בבית ספר. המערכת מספקת פתרון אינטגרטיבי לניהול תלמידים, מורים, קורסים, כיתות, מערכת שעות, נוכחות, ציונים ותקשורת.
+            </p>
+            
+            <div class="diagram-container">
+                <div class="diagram-title">תרשים מבנה המערכת</div>
+                <svg class="diagram-svg" width="800" height="400" viewBox="0 0 800 400">
+                    <!-- Main System Box -->
+                    <rect x="250" y="20" width="300" height="60" rx="10" fill="#3498db" />
+                    <text x="400" y="55" text-anchor="middle" fill="white" font-weight="bold">מערכת ניהול בית ספר</text>
+                    
+                    <!-- User Types -->
+                    <rect x="100" y="150" width="150" height="50" rx="10" fill="#2ecc71" />
+                    <text x="175" y="180" text-anchor="middle" fill="white" font-weight="bold">תלמידים</text>
+                    
+                    <rect x="325" y="150" width="150" height="50" rx="10" fill="#e74c3c" />
+                    <text x="400" y="180" text-anchor="middle" fill="white" font-weight="bold">מורים</text>
+                    
+                    <rect x="550" y="150" width="150" height="50" rx="10" fill="#f39c12" />
+                    <text x="625" y="180" text-anchor="middle" fill="white" font-weight="bold">מנהלי מערכת</text>
+                    
+                    <!-- Connecting Lines -->
+                    <line x1="175" y1="150" x2="350" y2="80" stroke="#333" stroke-width="2" />
+                    <line x1="400" y1="150" x2="400" y2="80" stroke="#333" stroke-width="2" />
+                    <line x1="625" y1="150" x2="450" y2="80" stroke="#333" stroke-width="2" />
+                    
+                    <!-- Features -->
+                    <rect x="50" y="250" width="120" height="40" rx="5" fill="#9b59b6" />
+                    <text x="110" y="275" text-anchor="middle" fill="white" font-size="14">צפייה בקורסים</text>
+                    <line x1="110" y1="250" x2="150" y2="200" stroke="#333" stroke-width="1" />
+                    
+                    <rect x="180" y="250" width="120" height="40" rx="5" fill="#9b59b6" />
+                    <text x="240" y="275" text-anchor="middle" fill="white" font-size="14">הגשת עבודות</text>
+                    <line x1="240" y1="250" x2="175" y2="200" stroke="#333" stroke-width="1" />
+                    
+                    <rect x="310" y="250" width="120" height="40" rx="5" fill="#9b59b6" />
+                    <text x="370" y="275" text-anchor="middle" fill="white" font-size="14">ניהול קורסים</text>
+                    <line x1="370" y1="250" x2="400" y2="200" stroke="#333" stroke-width="1" />
+                    
+                    <rect x="440" y="250" width="120" height="40" rx="5" fill="#9b59b6" />
+                    <text x="500" y="275" text-anchor="middle" fill="white" font-size="14">רישום נוכחות</text>
+                    <line x1="500" y1="250" x2="425" y2="200" stroke="#333" stroke-width="1" />
+                    
+                    <rect x="570" y="250" width="120" height="40" rx="5" fill="#9b59b6" />
+                    <text x="630" y="275" text-anchor="middle" fill="white" font-size="14">ניהול משתמשים</text>
+                    <line x1="630" y1="250" x2="625" y2="200" stroke="#333" stroke-width="1" />
+                    
+                    <!-- Database -->
+                    <rect x="325" y="330" width="150" height="50" rx="10" fill="#34495e" />
+                    <text x="400" y="360" text-anchor="middle" fill="white" font-weight="bold">מסד נתונים SQLite</text>
+                    
+                    <!-- Database Connections -->
+                    <line x1="110" y1="290" x2="350" y2="330" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                    <line x1="240" y1="290" x2="370" y2="330" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                    <line x1="370" y1="290" x2="390" y2="330" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                    <line x1="500" y1="290" x2="410" y2="330" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                    <line x1="630" y1="290" x2="430" y2="330" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                </svg>
+            </div>
+            
+            <h3>מטרות הפרויקט</h3>
+            <ul>
+                <li>פיתוח מערכת מקיפה לניהול כל היבטי בית הספר</li>
+                <li>ייעול תהליכי העבודה של הצוות החינוכי והמנהלי</li>
+                <li>שיפור התקשורת בין כל בעלי העניין (תלמידים, מורים, הנהלה)</li>
+                <li>מתן גישה נוחה ומאובטחת למידע רלוונטי לכל סוג משתמש</li>
+                <li>אוטומציה של תהליכים מנהליים שגרתיים</li>
+                <li>יצירת מערכת גמישה וניתנת להרחבה בהתאם לצרכים עתידיים</li>
+                <li>מעקב מדויק אחר נוכחות והישגי תלמידים</li>
+                <li>ניהול יעיל של משאבי בית הספר (כיתות, זמני לימוד)</li>
+                <li>הפחתת טעויות אנוש בתהליכים מנהליים</li>
+                <li>שיפור הנגישות למידע עבור כל בעלי העניין</li>
+            </ul>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>ניהול תלמידים</h4>
+                    <p>רישום תלמידים חדשים, עדכון פרטים אישיים, מעקב אחר התקדמות, ניהול נוכחות והישגים.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>ניהול מורים</h4>
+                    <p>רישום מורים חדשים, הקצאת קורסים, ניהול מערכת שעות, מעקב אחר ביצועים.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>ניהול קורסים</h4>
+                    <p>יצירת קורסים חדשים, עדכון תכני קורס, ניהול חומרי לימוד, הקצאת מורים וכיתות.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>ניהול כיתות</h4>
+                    <p>הגדרת כיתות פיזיות, ניהול קיבולת, הקצאת כיתות לקורסים ושיעורים.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>ניהול מערכת שעות</h4>
+                    <p>יצירת מערכת שעות לתלמידים ומורים, זיהוי וטיפול בחפיפות, תצוגה ויזואלית.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>ניהול נוכחות</h4>
+                    <p>רישום נוכחות בשיעורים, הפקת דוחות נוכחות, התראות על היעדרויות.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>ניהול עבודות בית</h4>
+                    <p>יצירת עבודות בית, הגדרת מועדי הגשה, הגשה מקוונת, בדיקה ומתן ציונים.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>ניהול חומרי לימוד</h4>
+                    <p>העלאת חומרי לימוד, ארגון לפי קורסים, גישה מקוונת לתלמידים.</p>
+                </div>
+            </div>
+            
+            <h3>סוגי משתמשים</h3>
+            <p>המערכת תומכת בשלושה סוגי משתמשים עיקריים, כל אחד עם הרשאות וממשק ייחודיים:</p>
+            
+            <h4>תלמידים</h4>
+            <p>
+                תלמידים יכולים לצפות במערכת השעות האישית שלהם, לראות את הקורסים בהם הם רשומים, לעקוב אחר נוכחות והישגים, להגיש עבודות בית, ולקבל הודעות ועדכונים מהמורים וההנהלה.
+            </p>
+            
+            <div class="highlight">
+                <strong>יכולות מרכזיות לתלמידים:</strong>
+                <ul>
+                    <li>צפייה במערכת שעות אישית עם תצוגה שבועית ויומית</li>
+                    <li>גישה לחומרי לימוד ומשאבים של הקורסים</li>
+                    <li>הגשת עבודות בית באופן מקוון</li>
+                    <li>צפייה בציונים והערות המורים</li>
+                    <li>מעקב אחר היסטוריית נוכחות</li>
+                    <li>קבלת התראות על מועדי הגשה קרבים</li>
+                    <li>ייצוא מערכת שעות לפורמט PDF</li>
+                    <li>צפייה בפרטי קורסים ומידע על שיעורים</li>
+                </ul>
+            </div>
+            
+            <div class="code-sample">
+                <div class="code-sample-title">דוגמת קוד: הצגת מערכת שעות לתלמיד (מתוך student.ejs)</div>
+                <pre>
+&lt;% 
+  // הגדרת משתני עזר למערכת השעות
+  const timeSlots = [
+    "08:00", "09:00", "10:00", "11:00", "12:00",
+    "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"
+  ];
+  const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'];
+  
+  // הכנת הנתונים לשבוע הקרוב
+  const nextWeekDays = [];
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(today);
+    day.setDate(today.getDate() + i);
+    nextWeekDays.push(day);
+  }
+%&gt;
+
+&lt;div class="improved-schedule-container"&gt;
+  &lt;div class="time-column"&gt;
+    &lt;div class="time-header"&gt;&lt;i class="fas fa-clock"&gt;&lt;/i&gt;&lt;/div&gt;
+    &lt;% timeSlots.forEach(time =&gt; { %&gt;
+      &lt;div class="time-slot"&gt;&lt;%= time %&gt;&lt;/div&gt;
+    &lt;% }); %&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="days-container"&gt;
+    &lt;% days.forEach((dayName, index) =&gt; { %&gt;
+      &lt;div class="day-column"&gt;
+        &lt;div class="day-header"&gt;
+          &lt;div&gt;&lt;i class="fas fa-calendar-day"&gt;&lt;/i&gt; &lt;%= dayName %&gt;&lt;/div&gt;
+          &lt;div class="day-date"&gt;&lt;%= nextWeekDays[index].toLocaleDateString('he-IL') %&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="day-lessons"&gt;
+          &lt;% timeSlots.forEach(timeSlot =&gt; { %&gt;
+            &lt;div class="time-cell"&gt;
+              &lt;%
+                // חיפוש שיעורים ביום ובשעה הנוכחיים
+                const dayLessons = schedule.filter(course =&gt; {
+                  const lessonDate = new Date(course.LESSON_DATE);
+                  return lessonDate.toDateString() === nextWeekDays[index].toDateString();
+                });
+                
+                // חיפוש שיעורים בטווח השעות הנוכחי
+                const lessonsInSlot = dayLessons.filter(lesson =&gt; {
+                  const timeSlotHour = parseInt(timeSlot.split(':')[0]);
+                  const lessonStartHour = parseInt(lesson.start_time.split(':')[0]);
+                  const lessonEndHour = parseInt(lesson.end_time.split(':')[0]);
+                  return lessonStartHour &lt;= timeSlotHour && lessonEndHour &gt; timeSlotHour;
+                });
+              %&gt;
+              
+              &lt;% if (lessonsInSlot.length &gt; 0) { %&gt;
+                &lt;% lessonsInSlot.forEach(lesson =&gt; { %&gt;
+                  &lt;div class="lesson-item" data-course-id="&lt;%= lesson.ID_COURSE %&gt;"&gt;
+                    &lt;div class="lesson-tooltip"&gt;
+                      &lt;strong&gt;&lt;%= lesson.Name_Course %&gt;&lt;/strong&gt;
+                      &lt;p&gt;זמן: &lt;%= lesson.start_time %&gt; - &lt;%= lesson.end_time %&gt;&lt;/p&gt;
+                      &lt;% if (lesson.infromation) { %&gt;
+                        &lt;p&gt;מידע: &lt;%= lesson.infromation %&gt;&lt;/p&gt;
+                      &lt;% } %&gt;
+                    &lt;/div&gt;
+                    &lt;div class="lesson-title"&gt;&lt;i class="fas fa-book"&gt;&lt;/i&gt; &lt;%= lesson.Name_Course %&gt;&lt;/div&gt;
+                    &lt;div class="lesson-time"&gt;&lt;i class="far fa-clock"&gt;&lt;/i&gt; &lt;%= lesson.start_time %&gt; - &lt;%= lesson.end_time %&gt;&lt;/div&gt;
+                  &lt;/div&gt;
+                &lt;% }); %&gt;
+              &lt;% } %&gt;
+            &lt;/div&gt;
+          &lt;% }); %&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;% }); %&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+            </div>
+            
+            <h4>מורים</h4>
+            <p>
+                מורים יכולים לנהל את הקורסים שהם מלמדים, לרשום נוכחות, להזין ציונים, לתקשר עם תלמידים, לצפות במערכת השעות שלהם, ולנהל משאבי למידה.
+            </p>
+            
+            <div class="highlight">
+                <strong>יכולות מרכזיות למורים:</strong>
+                <ul>
+                    <li>ניהול קורסים ותכני לימוד</li>
+                    <li>העלאת חומרי לימוד ומשאבים</li>
+                    <li>יצירת ובדיקת עבודות בית</li>
+                    <li>רישום נוכחות תלמידים בשיעורים</li>
+                    <li>הזנת ציונים והערות</li>
+                    <li>צפייה במערכת שעות אישית</li>
+                    <li>תקשורת עם תלמידים</li>
+                    <li>צפייה ברשימת התלמידים בקורסים</li>
+                    <li>מעקב אחר הגשות עבודות</li>
+                </ul>
+            </div>
+            
+            <div class="code-sample">
+                <div class="code-sample-title">דוגמת קוד: רישום נוכחות תלמידים (מתוך teacher.ejs)</div>
+                <pre>
+&lt;form id="markAttendanceForm" action="/teacher/mark-attendance" method="post"&gt;
+  &lt;label for="lessonId"&gt;בחר שיעור:&lt;/label&gt;
+  &lt;select name="lessonId" id="lessonId" required&gt;
+    &lt;% lessons.forEach(lesson =&gt; { %&gt;
+      &lt;option value="&lt;%= lesson.ID_LESSON %&gt;"&gt;
+        &lt;%= new Date(lesson.LESSON_DATE).toLocaleDateString('he-IL') %&gt; - &lt;%= lesson.Name_Course %&gt;
+      &lt;/option&gt;
+    &lt;% }); %&gt;
+  &lt;/select&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;סטודנט&lt;/th&gt;
+        &lt;th&gt;נוכח&lt;/th&gt;
+        &lt;th&gt;לא נוכח&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;% students.forEach(student =&gt; { %&gt;
+        &lt;tr&gt;
+          &lt;td&gt;&lt;%= student.NAME_STUDENT %&gt;&lt;/td&gt;
+          &lt;td&gt;
+            &lt;input type="radio" name="attendance[&lt;%= student.ID_ %&gt;]" value="1" required&gt; נוכח
+          &lt;/td&gt;
+          &lt;td&gt;
+            &lt;input type="radio" name="attendance[&lt;%= student.ID_ %&gt;]" value="0" required&gt; לא נוכח
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;% }); %&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+  &lt;button type="submit" class="btn-submit"&gt;שמור נוכחות&lt;/button&gt;
+&lt;/form&gt;</pre>
+            </div>
+            
+            <h4>מנהלי מערכת</h4>
+            <p>
+                מנהלי המערכת אחראים על ניהול כל היבטי המערכת, כולל הוספת משתמשים חדשים, ניהול קורסים וכיתות, הקצאת מורים לקורסים, רישום תלמידים לקורסים, ניהול מערכת השעות, והפקת דוחות.
+            </p>
+            
+            <div class="highlight">
+                <strong>יכולות מרכזיות למנהלי מערכת:</strong>
+                <ul>
+                    <li>ניהול משתמשים (תלמידים, מורים, מנהלים)</li>
+                    <li>יצירה וניהול של קורסים וכיתות</li>
+                    <li>הקצאת מורים לקורסים</li>
+                    <li>רישום תלמידים לקורסים</li>
+                    <li>ניהול מערכת השעות הכללית</li>
+                    <li>הפקת דוחות מערכתיים</li>
+                    <li>ניהול הרשאות גישה</li>
+                    <li>גיבוי ושחזור נתונים</li>
+                    <li>זיהוי וטיפול בחפיפות במערכת השעות</li>
+                    <li>ניהול משאבי בית הספר (כיתות, זמני לימוד)</li>
+                </ul>
+            </div>
+            
+            <div class="code-sample">
+                <div class="code-sample-title">דוגמת קוד: רישום תלמיד לקורס (מתוך Management.js)</div>
+                <pre>
+// עדכון קורסים לתלמיד
+router.post('/update-student-courses', async (req, res) => {
+  const { studentId, courseIds } = req.body;
+  
+  if (!studentId || !Array.isArray(courseIds)) {
+    return res.status(400).json({ error: "נתונים חסרים או לא תקינים" });
+  }
+  
+  try {
+    // מחיקת רישומים קיימים
+    const deleteQuery = `DELETE FROM REGISTRATION_FOR_COURSE WHERE ID_STUDENT = ${studentId}`;
+    await dbFun.updateData(deleteQuery);
+    
+    // הוספת רישומים חדשים
+    for (const courseId of courseIds) {
+      const insertQuery = `INSERT INTO REGISTRATION_FOR_COURSE (ID_STUDENT, ID_COURSE) 
+                          VALUES (${studentId}, ${courseId})`;
+      await dbFun.updateData(insertQuery);
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: "הקורסים עודכנו בהצלחה",
+      courseCount: courseIds.length
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});</pre>
+            </div>
+            
+            <div class="screenshot">
+                <div class="screenshot-caption">תצוגת מסך רישום תלמיד לקורס - ממשק מנהל</div>
+                <svg class="diagram-svg" width="800" height="500" viewBox="0 0 800 500">
+                    <!-- Mock UI for student registration -->
+                    <rect x="0" y="0" width="800" height="500" fill="#f5f5f5" />
+                    
+                    <!-- Header -->
+                    <rect x="0" y="0" width="800" height="60" fill="#4CAF50" />
+                    <text x="400" y="35" text-anchor="middle" fill="white" font-size="20" font-weight="bold">רישום תלמיד לקורס</text>
+                    
+                    <!-- Back button -->
+                    <rect x="20" y="15" width="80" height="30" rx="5" fill="white" />
+                    <text x="60" y="35" text-anchor="middle" fill="#4CAF50" font-size="14">חזרה</text>
+                    
+                    <!-- Main content -->
+                    <rect x="50" y="80" width="700" height="400" rx="5" fill="white" stroke="#ddd" stroke-width="1" />
+                    
+                    <!-- Student selection -->
+                    <text x="100" y="120" font-size="16" font-weight="bold">בחר תלמיד:</text>
+                    <rect x="100" y="130" width="250" height="40" rx="5" fill="#f9f9f9" stroke="#ddd" stroke-width="1" />
+                    <text x="120" y="155" font-size="14">-- בחר תלמיד --</text>
+                    <polygon points="330,140 340,150 330,160" fill="#666" />
+                    
+                    <!-- Course lists -->
+                    <rect x="100" y="190" width="250" height="250" rx="5" fill="#f9f9f9" stroke="#ddd" stroke-width="1" />
+                    <text x="225" y="210" text-anchor="middle" font-size="16" font-weight="bold">קורסים זמינים</text>
+                    
+                    <rect x="450" y="190" width="250" height="250" rx="5" fill="#f9f9f9" stroke="#ddd" stroke-width="1" />
+                    <text x="575" y="210" text-anchor="middle" font-size="16" font-weight="bold">קורסים רשומים</text>
+                    
+                    <!-- Course items -->
+                    <rect x="110" y="230" width="230" height="40" rx="5" fill="#e8f5e9" stroke="#4CAF50" stroke-width="1" />
+                    <text x="130" y="255" font-size="14">מתמטיקה</text>
+                    
+                    <rect x="110" y="280" width="230" height="40" rx="5" fill="#e8f5e9" stroke="#4CAF50" stroke-width="1" />
+                    <text x="130" y="305" font-size="14">אנגלית</text>
+                    
+                    <rect x="110" y="330" width="230" height="40" rx="5" fill="#e8f5e9" stroke="#4CAF50" stroke-width="1" />
+                    <text x="130" y="355" font-size="14">היסטוריה</text>
+                    
+                    <rect x="460" y="230" width="230" height="40" rx="5" fill="#e3f2fd" stroke="#2196F3" stroke-width="1" />
+                    <text x="480" y="255" font-size="14">פיזיקה</text>
+                    
+                    <rect x="460" y="280" width="230" height="40" rx="5" fill="#e3f2fd" stroke="#2196F3" stroke-width="1" />
+                    <text x="480" y="305" font-size="14">כימיה</text>
+                    
+                    <!-- Arrows -->
+                    <line x1="370" y1="250" x2="430" y2="250" stroke="#666" stroke-width="2" />
+                    <polygon points="425,250 435,253 430,240" fill="#666" />
+                    
+                    <line x1="430" y1="300" x2="370" y2="300" stroke="#666" stroke-width="2" />
+                    <polygon points="375,300 365,303 370,290" fill="#666" />
+                    
+                    <!-- Save button -->
+                    <rect x="600" y="460" width="100" height="40" rx="5" fill="#4CAF50" />
+                    <text x="650" y="485" text-anchor="middle" fill="white" font-size="16">שמור</text>
+                </svg>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <section id="system-requirements">
+            <h2>3. דרישות המערכת</h2>
+            
+            <h3>3.1 דרישות פונקציונליות</h3>
+            
+            <h4>ניהול משתמשים</h4>
+            <ul>
+                <li>המערכת תאפשר יצירת חשבונות משתמש לתלמידים, מורים ומנהלי מערכת</li>
+                <li>המערכת תאפשר עדכון פרטי משתמש (שם, אימייל, סיסמה, וכו')</li>
+                <li>המערכת תאפשר השבתה או מחיקה של חשבונות משתמש</li>
+                <li>המערכת תנהל הרשאות גישה שונות לכל סוג משתמש</li>
+                <li>המערכת תאפשר שליחת הודעות אימייל למשתמשים</li>
+                <li>המערכת תאפשר איפוס סיסמה למשתמשים</li>
+            </ul>
+            
+            <div class="code-explanation">
+                <div class="code-block">
+                    <pre>
+// דוגמת קוד: יצירת משתמש חדש (מתוך Management.js)
+router.post('/addstudint', async (req, res) => {
+  const { firstName, phone, email, id, password } = req.body;
+
+  // בדיקה אם יש משתמש עם אותו אימייל או שם
+  const checkQuery = `SELECT * FROM USERS 
+    WHERE USER_NAME = '${email}' OR USER_NAME = '${firstName}'`;
+  const existingUsers = await dbFun.get_data(checkQuery);
+  
+  if (existingUsers.length > 0) {
+    return res.status(400).json({ 
+      error: 'משתמש עם אותו אימייל או שם כבר קיים' 
+    });
+  }
+
+  // בדיקה אם ID חוקי
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID לא חוקי' });
+  }
+
+  // הוספת התלמיד לטבלת STUDENT
+  const query = `INSERT INTO STUDENT (NAME_STUDENT, phone, email, ID_)
+    VALUES ('${firstName}', ${phone}, '${email}', ${id})`;
+    
+  // הוספת המשתמש לטבלת USERS
+  const userQuery = `INSERT INTO USERS 
+    (ID_STUDENT, ID_TEACHER, USER_NAME, PASSWORD, USER_TYPE)
+    VALUES (${id}, NULL, '${email}', '${generateRandomCode()}', 'STUDENT')`;
+    
+  await dbFun.updateData(query);
+  await dbFun.updateData(userQuery);
+  
+  // שליחת אימייל עם פרטי ההתחברות
+  await sendGmail("1234", email);
+  
+  res.status(200).json({ firstName, phone, email, id });
+});</pre>
+                </div>
+                <div class="explanation">
+                    <h4>הסבר הקוד:</h4>
+                    <ol>
+                        <li>הקוד מקבל בקשת POST עם פרטי התלמיד החדש.</li>
+                        <li>מתבצעת בדיקה אם קיים כבר משתמש עם אותו אימייל או שם משתמש.</li>
+                        <li>מתבצעת בדיקת תקינות של מספר הזיהוי (ID).</li>
+                        <li>אם הבדיקות עוברות בהצלחה, נוספת רשומה חדשה לטבלת STUDENT.</li>
+                        <li>נוספת רשומה חדשה לטבלת USERS עם סיסמה ראשונית שנוצרת אוטומטית.</li>
+                        <li>נשלח אימייל לתלמיד עם פרטי ההתחברות.</li>
+                        <li>מוחזרת תשובת הצלחה עם פרטי התלמיד שנוסף.</li>
+                    </ol>
+                    <p>
+                        פונקציה זו מדגימה את תהליך הוספת משתמש חדש למערכת, כולל בדיקות תקינות ואבטחה בסיסיות. הפונקציה <code>generateRandomCode()</code> יוצרת סיסמה ראשונית אקראית, והפונקציה <code>sendGmail()</code> שולחת אימייל לתלמיד עם פרטי ההתחברות.
+                    </p>
+                </div>
+            </div>
+            
+            <h4>אימות והרשאות</h4>
+            <ul>
+                <li>המערכת תדרוש התחברות באמצעות שם משתמש וסיסמה</li>
+                <li>המערכת תאפשר שחזור סיסמה באמצעות אימייל</li>
+                <li>המערכת תאכוף מדיניות סיסמאות חזקות</li>
+                <li>המערכת תנהל מנגנון הרשאות מבוסס תפקידים (RBAC)</li>
+                <li>המערכת תשמור על סשן משתמש מאובטח</li>
+                <li>המערכת תבצע ניתוק אוטומטי לאחר פרק זמן של חוסר פעילות</li>
+            </ul>
+            
+            <div class="code-sample">
+                <div class="code-sample-title">דוגמת קוד: מנגנון אימות והרשאות (מתוך auth.js)</div>
+                <pre>
+// פונקציית middleware לאימות משתמש
+function authenticate(req, res, next) {
+  // בדיקה אם קיים סשן משתמש
+  if (!req.session || !req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
+}
+
+// פונקציית middleware לבדיקת הרשאות מנהל
+function isManagement(req, res, next) {
+  // בדיקה אם המשתמש הוא מנהל
+  if (!req.session || !req.session.user || req.session.user.role !== 'admin') {
+    return res.status(403).send('אין הרשאה לגשת לדף זה');
+  }
+  next();
+}
+
+// פונקציית middleware לבדיקת הרשאות מורה
+function isTeacher(req, res, next) {
+  // בדיקה אם המשתמש הוא מורה
+  if (!req.session || !req.session.user || req.session.user.role !== 'teacher') {
+    return res.status(403).send('אין הרשאה לגשת לדף זה');
+  }
+  next();
+}
+
+// פונקציית middleware לבדיקת הרשאות תלמיד
+function isStudent(req, res, next) {
+  // בדיקה אם המשתמש הוא תלמיד
+  if (!req.session || !req.session.user || req.session.user.role !== 'student') {
+    return res.status(403).send('אין הרשאה לגשת לדף זה');
+  }
+  next();
+}
+
+// טיפול בבקשת התחברות
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  
+  try {
+    // בדיקה אם המשתמש קיים במערכת
+    const user = await db.getUserByUsername(username);
+    
+    if (!user) {
+      return res.render('login', { error: 'שם משתמש או סיסמה שגויים' });
+    }
+    
+    // בדיקת סיסמה
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    
+    if (!isPasswordValid) {
+      return res.render('login', { error: 'שם משתמש או סיסמה שגויים' });
+    }
+    
+    // יצירת סשן למשתמש
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      role: user.role
+    };
+    
+    // הפניה לדף הבית המתאים לפי תפקיד המשתמש
+    switch (user.role) {
+      case 'student':
+        return res.redirect('/student');
+      case 'teacher':
+        return res.redirect('/teacher');
+      case 'admin':
+        return res.redirect('/management');
+      default:
+        return res.redirect('/');
+    }
+  } catch (error) {
+    console.error('שגיאה בהתחברות:', error);
+    return res.render('login', { error: 'אירעה שגיאה. אנא נסה שנית מאוחר יותר.' });
+  }
+});</pre>
+            </div>
+            
+            <h4>ניהול קורסים</h4>
+            <ul>
+                <li>המערכת תאפשר יצירה, עדכון ומחיקה של קורסים</li>
+                <li>המערכת תאפשר הקצאת מורים לקורסים</li>
+                <li>המערכת תאפשר רישום תלמידים לקורסים</li>
+                <li>המערכת תאפשר ניהול חומרי לימוד לכל קורס</li>
+                <li>המערכת תאפשר יצירה וניהול של עבודות בית לכל קורס</li>
+                <li>המערכת תאפשר הגדרת מועדי התחלה וסיום לקורסים</li>
+                <li>המערכת תאפשר הגדרת שעות לימוד לקורסים</li>
+            </ul>
+            
+            <div class="code-explanation">
+                <div class="code-block">
+                    <pre>
+// דוגמת קוד: הוספת קורס חדש (מתוך Management.js)
+router.post('/addCorse', async (req, res) => {
+  try {
+    const { 
+      courseName, 
+      information, 
+      startDate, 
+      startTime, 
+      endDate, 
+      endTime, 
+      teacherSelect 
+    } = req.body;
+
+    // בדיקה שכל השדות הנדרשים קיימים
+    if (!courseName || !information || !startDate || 
+        !startTime || !endDate || !endTime || !teacherSelect) {
+      return res.status(400).json({ 
+        error: 'יש למלא את כל השדות הנדרשים' 
+      });
+    }
+
+    // הוספת הקורס למסד הנתונים
+    const userQuery = `
+      INSERT INTO COURSE (
+        Name_Course, infromation, start_date, start_time, 
+        end_date, end_time, ID_TEACHER
+      )
+      VALUES (
+        '${courseName}', '${information}', '${startDate}', 
+        '${startTime}', '${endDate}', '${endTime}', ${teacherSelect}
+      )
+    `;
+
+    await dbFun.updateData(userQuery);
+    

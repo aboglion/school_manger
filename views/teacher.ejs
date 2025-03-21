@@ -158,8 +158,7 @@
                           const courseId = lesson.ID_COURSE || lesson.COURSE_ID || lesson.id_course;
                         %>
                         <%
-                          // Make sure we have a valid course ID
-                          const courseId = lesson.ID_COURSE || lesson.COURSE_ID || lesson.id_course;
+                          // No need to redeclare courseId, it's already defined above
                         %>
                         <div class="lesson-item"
                              data-course-id="<%= courseId %>"
